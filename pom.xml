@@ -35,6 +35,7 @@
 						<applicationName>Test1-Sandbox</applicationName>
 						<environment>Sandbox</environment>
 						<region>us-east-1</region>
+						<objectStoreV2>true</objectStoreV2>
 						<workers>1</workers>
 						<workerType>Micro</workerType>
 					</cloudHubDeployment>
