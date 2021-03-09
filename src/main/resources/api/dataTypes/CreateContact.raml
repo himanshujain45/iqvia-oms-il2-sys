@@ -1,0 +1,110 @@
+#%RAML 1.0 DataType
+type: object
+description: 'Defines structure of create Contact request'
+#examples: !include ../examples/Contact.raml
+properties: 
+  firstName:
+    type: string
+    maxLength: 80
+    required: true
+  lastName:
+    type: string
+    maxLength: 80
+    required: true
+  emailAddress:
+    type: string
+    maxLength: 80
+    required: false
+  emailType:
+    type: string
+    maxLength: 20
+    required: false
+    enum:
+      - Primary
+  contactStatus:
+    type: string
+    maxLength: 30
+    required: true
+    enum:
+      - Active
+  dateCreated:
+    type: datetime
+    required: true
+  dateStart:
+    type: datetime
+    required: true
+  sharedEmailAddress:
+    type: integer
+    required: false
+    enum:
+      - 0
+  isPrimary:
+    type: integer
+    required: false
+    enum:
+      - 0
+  isInvestigator:
+    type: integer
+    required: true
+    enum:
+      - 0
+  entityId:
+    type: integer
+    required: true
+    enum:
+      - 0
+  recordStatus:
+    type: integer
+    required: true
+    enum:
+      - 0
+  novellaExperience:
+    type: integer
+    required: true
+    enum:
+      - 0
+  quintilesExperience:
+    type: integer
+    required: true
+    enum:
+      - 0
+  invInfants:
+    type: integer
+    required: true
+    enum:
+      - 0
+  invNeoNates:
+    type: integer
+    required: true
+    enum:
+      - 0
+  invPediatric:
+    type: integer
+    required: true
+    enum:
+      - 0
+  invCentralIrb:
+    type: integer
+    required: true
+    enum:
+      - 0
+  invRetired:
+    type: integer
+    required: true
+    enum:
+      - 0
+  invDeceased:
+    type: integer
+    required: true
+    enum:
+      - 0
+  fromAsco:
+    type: integer
+    required: false
+    enum:
+      - 0
+  lastUser:
+    type: integer
+    required: true
+
+  

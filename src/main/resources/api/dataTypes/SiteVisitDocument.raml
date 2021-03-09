@@ -1,0 +1,82 @@
+  #%RAML 1.0 NamedExample
+type: object
+description: 'Defines structure of Site Visit Document request'
+properties:
+  lastUser:
+    type: integer
+    required: true
+  monitoringVisitId:
+    type: integer
+    required: true
+  migrationDate:
+    type: datetime
+    required: true
+  retries:
+    type: integer
+    required: true
+    enum:
+      - 0
+  entityId:
+    type: integer
+    required: true
+    enum:
+      - 0
+  recordStatus:
+    type: integer
+    required: true
+    enum:
+      - 0
+  attachmentName:
+    type: string
+    required: true
+  author:
+    type: integer
+    required: false
+  contentSize:
+    type: integer
+    required: true
+    enum:
+      - 0  
+  isCheckedOut:
+    type: integer
+    required: true
+    enum:
+      - 0
+  isInternalViewOnly:
+    type: integer
+    required: true
+    enum:
+      - 0
+  dateSigned:
+    type: datetime
+    required: true
+  dateSignedUser:
+    type: datetime
+    required: true
+  isLocked:
+    type: integer
+    required: true
+    enum:
+      - 0
+  relatedTypeId:
+    type: integer
+    required: true
+  signAction:
+    type: string
+    required: true
+  signStatus:
+    type: integer
+    required: true
+  objectType:
+    type: string
+    required: true
+  status:
+    type: string
+    required: true
+  wsUrl:
+    type: string
+    required: true
+  siteVisitType:
+    type: string
+    required: true
+  

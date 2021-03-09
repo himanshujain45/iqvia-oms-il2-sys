@@ -1,0 +1,26 @@
+#%RAML 1.0 NamedExample
+value:
+  {
+"signAction": "final approval signatures",
+"lastUser": 9,
+"entityId": 0,
+"isLocked": "1",
+"recordStatus": 0,
+"retries": 0,
+"objectId": 0,
+"status": 'success',
+"migrationDate": "2016-02-28T16:41:41.090Z",
+"dateSigned": "2016-02-28T16:41:41.090Z",
+"dateSignedUser": "2016-02-28T16:41:41.090Z",
+"objectType": "monitoring visit report",
+"monitoringVisitId": 0,
+"templateId": 1,
+"reportStatus": 68,
+"lastMvrUser": 9,
+"reportIteration": 0,
+"dateUploadedToWs": "2016-02-28T16:41:41.090Z",
+"signStatus": 0,
+"relatedType": "Report",
+"locationetailId": 0,
+"wsUrl": "https://tmftransform01.testing.mywingspan.com/wingspan-tmf/tmf/documentslist#detail/?state=&id=1000551600000000008E8DBF"
+}

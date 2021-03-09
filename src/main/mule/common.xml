@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:validation="http://www.mulesoft.org/schema/mule/validation"
+	xmlns:cloudhub="http://www.mulesoft.org/schema/mule/cloudhub"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:iqvia="http://www.mulesoft.org/schema/mule/iqvia"
+	xmlns:api-gateway="http://www.mulesoft.org/schema/mule/api-gateway"
+	xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+	xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties"
+	xmlns:rwts-iqvia-logging-connector="http://www.mulesoft.org/schema/mule/rwts-iqvia-logging-connector"
+	xmlns:java="http://www.mulesoft.org/schema/mule/java" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/rwts-iqvia-logging-connector http://www.mulesoft.org/schema/mule/rwts-iqvia-logging-connector/current/mule-rwts-iqvia-logging-connector.xsd
+http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd
+http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
+http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/mule/api-gateway/current/mule-api-gateway.xsd
+http://www.mulesoft.org/schema/mule/iqvia http://www.mulesoft.org/schema/mule/iqvia/current/mule-iqvia.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/cloudhub http://www.mulesoft.org/schema/mule/cloudhub/current/mule-cloudhub.xsd
+http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd">
+
+	<configuration-properties doc:name="Configuration properties" doc:id="648c7949-c398-4b11-84a0-69c0a3367cc8" file="common.yaml" />
+
+	<secure-properties:config name="Secure_Properties_Config_Env"
+		doc:name="Secure Properties Config"
+		doc:id="18d5377d-1ff9-4f28-8080-adc13f94b127" 
+		file="iqvia-dtms-il2-system-api.${mule.env}.yaml" key="${properties.key}">
+		<secure-properties:encrypt algorithm="AES" mode="CBC"/>
+	</secure-properties:config>
+    
+	<http:listener-config name="HttpsListenerConfig" doc:name="HTTPS Listener Configuration" basePath="${secure::system.api.basepath}">
+		<http:listener-connection host="${secure::system.api.host}" port="${https.port}" protocol="HTTPS" connectionIdleTimeout="1200000" usePersistentConnections="false">
+			<tls:context enabledCipherSuites="SSL_RSA_WITH_3DES_EDE_CBC_SHA,SSL_DHE_RSA_WITH_3DES_EDE_CBC_SHA,TLS_RSA_WITH_AES_128_CBC_SHA,TLS_DHE_DSS_WITH_AES_128_CBC_SHA,TLS_DHE_RSA_WITH_AES_128_CBC_SHA,TLS_RSA_WITH_AES_256_CBC_SHA,TLS_DHE_DSS_WITH_AES_256_CBC_SHA,TLS_DHE_RSA_WITH_AES_256_CBC_SHA,TLS_ECDH_ECDSA_WITH_3DES_EDE_CBC_SHA,TLS_ECDH_ECDSA_WITH_AES_128_CBC_SHA,TLS_ECDH_ECDSA_WITH_AES_256_CBC_SHA,TLS_ECDHE_ECDSA_WITH_3DES_EDE_CBC_SHA,TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA,TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA,TLS_ECDH_RSA_WITH_3DES_EDE_CBC_SHA,TLS_ECDH_RSA_WITH_AES_128_CBC_SHA,TLS_ECDH_RSA_WITH_AES_256_CBC_SHA,TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA,TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA,TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA,TLS_DHE_RSA_WITH_3DES_EDE_CBC_SHA">
+				<tls:key-store type="jks" path="localhost-keystore.jks" alias="${keystore.cert.alias}" keyPassword="${key.password}" password="${keystore.password}"/>
+			</tls:context>
+		</http:listener-connection>
+    </http:listener-config>
+ 	<api-gateway:autodiscovery apiId="${secure::system.api.Id}" ignoreBasePath="true" doc:name="API Autodiscovery" doc:id="376cf39b-2612-48cd-b5a7-57a50492b757" flowRef="iqvia-dtms-il2-sys-api-main" />
+	<iqvia:config name="IQVIA_Logging_Connector_Config" doc:name="IQVIA Logging Connector Config" doc:id="3762e524-32d4-4351-a115-bd9aa59cfebb" apiURL="${secure::logger.api.url}" clientId="${secure::logger.api.clientId}" clientSecret="${secure::logger.api.clientSecret}"/>
+	<db:config name="Database_Config" doc:name="Database Config" doc:id="50925935-400c-40ff-8a72-8e3677b0e3ff" >
+		<db:mssql-connection host="#[vars.dbConnection.dbhost]" instanceName="#[vars.dbConnection.dbinstance]" port="#[vars.dbConnection.dbport]" user="#[vars.dbConnection.dbuser]" password="#[vars.dbConnection.dbpassword]" databaseName="#[vars.dbConnection.dbdatabase]">
+			<reconnection >
+				<reconnect frequency="${secure::db.retryInterval}" count="${secure::db.retryCount}" />
+			</reconnection>
+			<db:pooling-profile maxPoolSize="${secure::pool.maxSize}" minPoolSize="${secure::pool.minSize}" preparedStatementCacheSize="${secure::pool.cacheSize}" maxWait="${secure::pool.maxWait}" acquireIncrement="${secure::pool.acquireInc}" maxIdleTime="${secure::pool.maxIdleTime}"/>
+		</db:mssql-connection>
+	</db:config>
+	<cloudhub:config
+		name="CloudHub_Config"
+		doc:name="CloudHub Config"
+		doc:id="3a180b01-9410-4fa5-a69f-e59c40308330">
+		<cloudhub:connection
+			username="${secure::cloudhub.username}"
+			password="${secure::cloudhub.password}"
+			environment="${secure::cloudhub.environmentId}" />
+	</cloudhub:config>
+	<configuration doc:name="Configuration" doc:id="264be79a-8c8e-44bc-a8df-68d7df56845d" defaultErrorHandler-ref="commonError_Handler" />
+	<validation:config name="Validation_Config" doc:name="Validation Config" doc:id="82d3ceed-c818-4f15-beb6-7d6695e882c0" />
+
+</mule>

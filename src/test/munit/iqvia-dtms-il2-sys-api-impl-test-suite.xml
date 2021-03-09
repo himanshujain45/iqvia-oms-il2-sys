@@ -1,0 +1,789 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="iqvia-dtms-il2-sys-api-impl-test-suite.xml" />
+	<munit:test name="iqvia-dtms-il2-sys-api-impl-test-suite-iqvia-dtms-il2-sys-api-implFlow-UserTest" doc:id="1d8e7349-ec58-4f0f-8591-7e2de582406d" description="Test" ignore="true">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="User" doc:id="f3dd6cac-6083-4cae-93e5-1deeea01a2d5" processor="db:select">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Database_Config" attributeName="config-ref" />
+					<munit-tools:with-attribute whereValue="users" attributeName="target" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:variables >
+						<munit-tools:variable key="users" value="#[MunitTools::getResourceAsString('responses/response_users.json')]" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="71f1b840-686b-4ade-9e51-b37f3b645150" >
+				<munit:variables >
+					<munit:variable key="inputPayload" value="#[MunitTools::getResourceAsString('sample_data\actionItem_Request.json')]" mediaType="application/json" />
+				</munit:variables>
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to iqvia-dtms-il2-sys-api-implFlow-User" doc:id="2ee0d65f-9fc9-4670-be27-aaeb12edd8b8" name="iqvia-dtms-il2-sys-api-implFlow-User"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:verify-call doc:name="Verify call" doc:id="ddde9f4c-3a1c-4921-8757-d6eca655cd27" processor="db:select" atLeast="1">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Database_Config" attributeName="config-ref" />
+					<munit-tools:with-attribute whereValue="users" attributeName="target" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="iqvia-dtms-il2-sys-api-impl-test-suite-iqvia-dtms-il2-sys-api-implFlow-insertActionItemTest" doc:id="46879769-e2ad-4017-95de-2b6c1d6f0d5f" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="FlowRef" doc:id="7586b61f-b949-43bc-80f3-cee1b1617b2e" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="iqvia-dtms-il2-sys-api-implFlow-User" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:variables >
+						<munit-tools:variable key="users" value="#[MunitTools::getResourceAsString('responses/response_users.json')]" mediaType="application/json" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Status ID" doc:id="10660729-e52f-4068-8433-191282c01438" processor="db:select">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Database_Config" attributeName="config-ref" />
+					<munit-tools:with-attribute whereValue="studyIssueStatusID" attributeName="target" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:variables >
+						<munit-tools:variable key="studyIssueStatusID" value='#[[{ "ID": 1 }  ]]' />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="TypeID" doc:id="230ab0a6-5d93-4ec9-ba86-de3b4b8ff868" processor="db:select">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="studyIssueTypeID" attributeName="target" />
+					<munit-tools:with-attribute whereValue="Database_Config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:variables >
+						<munit-tools:variable key="studyIssueTypeID" value='#[[{ "ID": 208 }  ]]' />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="ActionItem" doc:id="d381b427-8c2a-4688-a109-ffbe86202c98" processor="db:insert">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="ActionItem" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="Database_Config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[MunitTools::getResourceAsString('responses/insertResponse.json')]" mediaType="application/json" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="7f4aae55-21b9-4314-b687-dd74e1a74c6a" >
+				<munit:variables >
+					<munit:variable key="inputPayload" value="#[MunitTools::getResourceAsString('sample_data/actionItem_Request.json')]" mediaType="application/json" />
+					<munit:variable key="tid" value="#['Insert Action Item']" mediaType="text/plain" />
+				</munit:variables>
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to iqvia-dtms-il2-sys-api-implFlow-insertActionItem" doc:id="f4d07aa7-59e0-480e-a74a-200725b2a3ab" name="iqvia-dtms-il2-sys-api-implFlow-insertActionItem"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="6fa08fd6-e519-4a90-ba19-8f6c1d1f5a4d" is="#[MunitTools::notNullValue()]" message="Action Item INSERT ID not populated" expression="#[payload.generatedKeys.GENERATED_KEYS]"/>
+			<munit-tools:verify-call doc:name="ActionItem" doc:id="f8bea293-58e2-4844-bd06-0eb7743d1296" processor="db:insert" atLeast="1">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="ActionItem" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="Database_Config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="iqvia-dtms-il2-sys-api-impl-test-suite-iqvia-dtms-il2-sys-api-implFlow-updateActionItemTest" doc:id="4519e2e4-7aa6-482f-b918-9ab558638431" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="FlowRef" doc:id="1db830cb-b32e-49df-bd2f-0b2e70868040" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="iqvia-dtms-il2-sys-api-implFlow-User" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:variables >
+						<munit-tools:variable key="users" value="#[MunitTools::getResourceAsString('responses/response_users.json')]" mediaType="application/json" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Status ID" doc:id="9399adca-63d3-43b8-8037-b67efe94dc70" processor="db:select">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Database_Config" attributeName="config-ref" />
+					<munit-tools:with-attribute whereValue="studyIssueStatusID" attributeName="target" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:variables >
+						<munit-tools:variable key="studyIssueStatusID" value='#[[{ "ID": 1 }  ]]' />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Type ID" doc:id="1d4acf34-452e-4972-ba48-9208008d0f72" processor="db:select">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="studyIssueTypeID" attributeName="target" />
+					<munit-tools:with-attribute whereValue="Database_Config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:variables >
+						<munit-tools:variable key="studyIssueTypeID" value='#[[{ "ID": 208 }  ]]' />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Action Item" doc:id="e51b88a2-e067-4a0d-9f1c-97a895ed1d11" processor="db:update">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Action Item" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="Database_Config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[MunitTools::getResourceAsString('responses/updateResponse.json')]" mediaType="application/json" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="9ac5431b-4a48-4a0e-a257-3ef61222265d" >
+				<munit:variables >
+					<munit:variable key="inputPayload" value="#[MunitTools::getResourceAsString('sample_data/actionItem_Request.json')]" mediaType="application/json" />
+					<munit:variable key="tid" value="#['Update Action Item']" mediaType="text/plain" />
+				</munit:variables>
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to iqvia-dtms-il2-sys-api-implFlow-updateActionItem" doc:id="f1b2474b-50e2-4b3d-9ed5-812ffe55ed9a" name="iqvia-dtms-il2-sys-api-implFlow-updateActionItem"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="2993fadf-171e-485b-8ca4-0117b552d03c" is="#[MunitTools::notNullValue()]" message="Action Item Update failure" expression="#[payload]"/>
+			<munit-tools:verify-call doc:name="Verify call" doc:id="fc011f14-4a63-4872-a317-8786228645b9" processor="db:update" atLeast="1">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Action Item" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="Database_Config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="iqvia-dtms-il2-sys-api-impl-test-suite-iqvia-dtms-il2-sys-api-implFlow-insertSiteVisitTest" doc:id="b917b7e8-c7bf-4a4b-8b41-07c014b69b1f" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="FlowRef" doc:id="685add13-74d3-41e1-b5ab-a282fa17406a" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="iqvia-dtms-il2-sys-api-implFlow-User" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:variables >
+						<munit-tools:variable key="users" value="#[MunitTools::getResourceAsString('responses/response_users.json')]" mediaType="application/json" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Monitoring Visit" doc:id="d725fb5c-2a3f-47b5-acbe-163a1a290b43" processor="db:insert">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Monitoring Visit" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="Database_Config" attributeName="config-ref" />
+					<munit-tools:with-attribute whereValue="monitoringVisit" attributeName="target" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:variables >
+						<munit-tools:variable key="monitoringVisit" value="#[MunitTools::getResourceAsString('responses/insertResponse.json')]" mediaType="application/json" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Contact ID" doc:id="96d76eab-a5bb-4b49-874a-3af79c61944c" processor="db:select">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Database_Config" attributeName="config-ref" />
+					<munit-tools:with-attribute whereValue="contact" attributeName="target" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:variables >
+						<munit-tools:variable key="contact" value='#[[{ "ID": 208 }  ]]' />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Monitoring Visit Contact" doc:id="1ca63110-7b8b-4e8d-9d21-1660dd400811" processor="db:insert">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Monitoring Visit Contact" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="Database_Config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[MunitTools::getResourceAsString('responses/insertResponse.json')]" mediaType="application/json" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Document Confirmation" doc:id="5f992f08-7aa6-42e7-973b-432bed51f35c" processor="db:insert">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Document Confirmation" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="Database_Config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[MunitTools::getResourceAsString('responses/insertResponse.json')]" mediaType="application/json" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Document FollowUp" doc:id="86687311-e83c-41b0-b08b-20f3fc269f7c" processor="db:insert">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Document FollowUp" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="Database_Config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[MunitTools::getResourceAsString('responses/insertResponse.json')]" mediaType="application/json" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="930fcf9b-8b49-4a21-9e61-6161e8b7de52" >
+				<munit:variables >
+					<munit:variable key="inputPayload" value="#[MunitTools::getResourceAsString('sample_data/siteVisit_Request.json')]" mediaType="application/json" />
+					<munit:variable key="tid" value="#['Insert Site Visit']" />
+				</munit:variables>
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to iqvia-dtms-il2-sys-api-implFlow-insertSiteVisit" doc:id="648e2228-d1b5-4d7d-96c2-ebe345405590" name="iqvia-dtms-il2-sys-api-implFlow-insertSiteVisit"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="613e8b76-ca4a-406a-a62c-10d0385d94b9" is="#[MunitTools::notNullValue()]" message="Site Visit INSERT failed" expression="#[vars.monitoringVisit.generatedKeys.GENERATED_KEYS]"/>
+			<munit-tools:verify-call doc:name="Verify call" doc:id="65631c17-813b-4aa3-8877-44f037fad2d9" processor="db:insert" atLeast="1">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Document FollowUp" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="Database_Config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="iqvia-dtms-il2-sys-api-impl-test-suite-iqvia-dtms-il2-sys-api-implFlow-updateSiteVisitTest" doc:id="992fefc0-4c0f-4269-9365-1a7d348e9eb9" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="FlowRef" doc:id="31b598c5-9327-43e4-a746-3bbbf33dd468" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="iqvia-dtms-il2-sys-api-implFlow-User" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:variables >
+						<munit-tools:variable key="users" value="#[MunitTools::getResourceAsString('responses/response_users.json')]" mediaType="application/json" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Monitoring Visit" doc:id="8aa498da-ff17-4821-8279-c7d16861faf9" processor="db:select">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Database_Config" attributeName="config-ref" />
+					<munit-tools:with-attribute whereValue="visitDate" attributeName="target" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:variables >
+						<munit-tools:variable key="visitDate" value='#[[{"PLANNED_VISIT_DATE": "2016-02-28T16:41:41.090Z"}]]' mediaType="application/json" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Monitoring Visit" doc:id="d018c513-6d4e-4c6c-8a6b-2f200d629968" processor="db:update">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Database_Config" attributeName="config-ref" />
+					<munit-tools:with-attribute whereValue="monitoringVisit" attributeName="target" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:variables >
+						<munit-tools:variable key="monitoringVisit" value="#[MunitTools::getResourceAsString('responses/updateResponse.json')]" mediaType="application/json" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Contact ID" doc:id="4b9d8dcb-63e7-4810-98d5-6a41eeb85320" processor="db:select">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Database_Config" attributeName="config-ref" />
+					<munit-tools:with-attribute whereValue="contact" attributeName="target" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:variables >
+						<munit-tools:variable key="contact" value='#[[{ "ID": 208 }  ]]' />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Contact ID Previous" doc:id="0a069912-9df2-4e03-83e9-cff3d8df5298" processor="db:select">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Database_Config" attributeName="config-ref" />
+					<munit-tools:with-attribute whereValue="contactPrev" attributeName="target" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:variables >
+						<munit-tools:variable key="contactPrev" value='#[[{ "ID": 207 }  ]]' />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Previous Contact" doc:id="a7bc94ab-2464-4416-99ea-3fd3f2d93cda" processor="db:update">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Previous Contact" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="Database_Config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[MunitTools::getResourceAsString('responses/updateResponse.json')]" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Monitoring Visit Contact" doc:id="6a59def6-18c4-49ca-bf97-a54784d6740f" processor="db:insert">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Monitoring Visit Contact" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="Database_Config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[MunitTools::getResourceAsString('responses/insertResponse.json')]" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Monitoring Contact Visit" doc:id="f8de93ab-b6d1-4627-a7e5-20843b0f9d19" processor="db:update">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Monitoring Contact Visit" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="Database_Config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[MunitTools::getResourceAsString('responses/updateResponse.json')]" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Document Confirmation" doc:id="a3a49525-037c-4647-ae30-488873b44299" processor="db:update">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Document Confirmation" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="Database_Config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[MunitTools::getResourceAsString('responses/updateResponse.json')]" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Document FollowUp" doc:id="3c06ff93-4361-455f-a749-eb4544c82092" processor="db:update">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Document FollowUp" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="Database_Config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[MunitTools::getResourceAsString('responses/updateResponse.json')]" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="91c11829-84d1-47a3-94fe-c9625fb858d0" >
+				<munit:variables >
+					<munit:variable key="inputPayload" value="#[MunitTools::getResourceAsString('sample_data/siteVisit_Request.json')]" mediaType="application/json" />
+					<munit:variable key="tid" value="#['Update Site Visit']" />
+				</munit:variables>
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to iqvia-dtms-il2-sys-api-implFlow-updateSiteVisit" doc:id="987da03c-fccd-4eb1-b36b-5d8d381300aa" name="iqvia-dtms-il2-sys-api-implFlow-updateSiteVisit"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="fb09d8a9-6091-417f-8c34-d516ca6a1b18" is="#[MunitTools::notNullValue()]" message="UPDATE of SITE VISIT failed" expression="#[vars.monitoringVisit]"/>
+			<munit-tools:verify-call doc:name="Verify call" doc:id="aca780ff-7bbf-4cf1-8722-d3e39903800d" processor="db:update" atLeast="1">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Document FollowUp" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="Database_Config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="iqvia-dtms-il2-sys-api-impl-test-suite-iqvia-dtms-il2-sys-api-implFlow-insertProtocolDevTest" doc:id="510828f0-36e9-431a-b2e8-1f7d1ac7a11c" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="FlowRef" doc:id="09916bea-560a-4c87-86a7-388bb1e7078e" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="iqvia-dtms-il2-sys-api-implFlow-User" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:variables >
+						<munit-tools:variable key="users" value="#[MunitTools::getResourceAsString('responses/response_users.json')]" mediaType="application/json" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="PD Category" doc:id="8499ae8d-bb1a-46ff-a1b9-1f554becd242" processor="db:select">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Database_Config" attributeName="config-ref" />
+					<munit-tools:with-attribute whereValue="pdCategoryID" attributeName="target" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:variables >
+						<munit-tools:variable key="pdCategoryID" value='#[[{ "ID": 208 }  ]]' />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="PD FollowUp" doc:id="1f9ac5d7-9ceb-4e9b-872e-b4328370047e" processor="db:select">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Database_Config" attributeName="config-ref" />
+					<munit-tools:with-attribute whereValue="pdFollowUpActionID" attributeName="target" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:variables >
+						<munit-tools:variable key="pdFollowUpActionID" value='#[[{ "ID": 208 }  ]]' />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Protocol Deviation" doc:id="41834ee5-8591-4aff-8684-b429c78db3dc" processor="db:insert">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Database_Config" attributeName="config-ref" />
+					<munit-tools:with-attribute whereValue="protocolDeviationID" attributeName="target" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:variables >
+						<munit-tools:variable key="protocolDeviationID" value="#[MunitTools::getResourceAsString('responses/insertResponse.json')]" mediaType="application/json" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="PD Site" doc:id="8dacfd73-67bc-4bc6-b11c-d515c27cb14c" processor="db:insert">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Database_Config" attributeName="config-ref" />
+					<munit-tools:with-attribute whereValue="pdSiteID" attributeName="target" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:variables >
+						<munit-tools:variable key="pdSiteID" value="#[MunitTools::getResourceAsString('responses/insertResponse.json')]" mediaType="application/json" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="PD Site Patient" doc:id="c5c54d30-962e-4464-a07b-dac04c2220dc" processor="db:insert">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="PD Site Patient" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="Database_Config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[MunitTools::getResourceAsString('responses/insertResponse.json')]" mediaType="application/json" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="916b2321-045c-47af-b732-df989aa439bf" >
+				<munit:variables >
+					<munit:variable key="inputPayload" value="#[MunitTools::getResourceAsString('sample_data\protocolDeviation_Request.json')]" mediaType="application/json" />
+					<munit:variable key="tid" value="#['Insert Protocol Deviation']" />
+				</munit:variables>
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to iqvia-dtms-il2-sys-api-implFlow-insertProtocolDev" doc:id="2c137812-c363-42af-882c-9957d855e362" name="iqvia-dtms-il2-sys-api-implFlow-insertProtocolDev"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="6c2be233-d89b-4097-9b6a-dc14a1afedaf" is="#[MunitTools::notNullValue()]" expression="#[vars.pdSiteID.generatedKeys.GENERATED_KEYS]" message="PROTOCOL DEVIATION INSERT failed"/>
+			<munit-tools:verify-call doc:name="Verify call" doc:id="123d1c41-1e46-418c-a62b-6649cac4f6b4" processor="ee:transform" atLeast="1">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="JSON Payload" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="iqvia-dtms-il2-sys-api-impl-test-suite-iqvia-dtms-il2-sys-api-implFlow-updateProtocolDevTest" doc:id="99e82ff6-5e46-44ab-a758-5fd0700a89b9" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="FlowRef" doc:id="c56d0c2f-c318-4a04-9b8e-c49ab6e53d5f" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="iqvia-dtms-il2-sys-api-implFlow-User" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:variables >
+						<munit-tools:variable key="users" value="#[MunitTools::getResourceAsString('responses/response_users.json')]" mediaType="application/json" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="PD Category" doc:id="396fd9e8-dbf1-43d5-8d8f-4b02cb2300c0" processor="db:select">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Database_Config" attributeName="config-ref" />
+					<munit-tools:with-attribute whereValue="pdCategoryID" attributeName="target" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:variables >
+						<munit-tools:variable key="pdCategoryID" value='#[[{ "ID": 208 }  ]]' />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="PD FollowUp Action" doc:id="061c6d0e-f734-435e-b4ce-b84130830141" processor="db:select">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Database_Config" attributeName="config-ref" />
+					<munit-tools:with-attribute whereValue="pdFollowUpActionID" attributeName="target" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:variables >
+						<munit-tools:variable key="pdFollowUpActionID" value='#[[{ "ID": 208 }  ]]' />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="PD Site" doc:id="e1abab4a-d6cd-4ff3-bab6-c6bcbe0f8ee4" processor="db:select">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Database_Config" attributeName="config-ref" />
+					<munit-tools:with-attribute whereValue="pdSite" attributeName="target" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:variables >
+						<munit-tools:variable key="pdSite" value='#[[{"PROTOCOL_DEVIATION_ID" : 1, "NO_SUBJECT_ASSOCIATED" :0}]]' />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="PD Site" doc:id="d2cc17cd-9c91-4957-ba43-9f015e90375d" processor="db:update">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="PD Site" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="Database_Config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[MunitTools::getResourceAsString('responses/updateResponse.json')]" mediaType="application/json" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Protocol Deviation" doc:id="d81ad973-35b9-4709-a3ce-09f2f4c57491" processor="db:update">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Protocol Deviation" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="Database_Config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[MunitTools::getResourceAsString('responses/updateResponse.json')]" mediaType="application/json" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="PD Site Patient" doc:id="53641fd8-685b-45cc-9997-3d0e121e2f07" processor="db:update">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="PD Site Patient" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="Database_Config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[MunitTools::getResourceAsString('responses/updateResponse.json')]" mediaType="application/json" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="8a579fc2-514e-42e3-8cfb-0ed72d456dc0" >
+				<munit:variables >
+					<munit:variable key="inputPayload" value="#[MunitTools::getResourceAsString('sample_data\protocolDeviation_Request.json')]" mediaType="application/json" />
+					<munit:variable key="tid" value="#['Update Protocol Deviation']" />
+				</munit:variables>
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to iqvia-dtms-il2-sys-api-implFlow-updateProtocolDev" doc:id="12e347c7-e688-4bc9-9026-ea898362b135" name="iqvia-dtms-il2-sys-api-implFlow-updateProtocolDev"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:verify-call doc:name="Verify call" doc:id="8fe37167-ffb1-425c-aea2-6ef4f908ba62" processor="db:update" atLeast="1">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Protocol Deviation" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="Database_Config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="iqvia-dtms-il2-sys-api-impl-test-suite-iqvia-dtms-il2-sys-api-implFlow-insertContactTest" doc:id="fc8206b2-a2e5-48be-beed-5b09f6e6dd2a" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="FlowRef" doc:id="aca7ffa1-2066-4948-8412-688b530d2589" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="iqvia-dtms-il2-sys-api-implFlow-User" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:variables >
+						<munit-tools:variable key="users" value="#[MunitTools::getResourceAsString('responses/response_users.json')]" mediaType="application/json" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Contact" doc:id="06de1bd8-9297-4d0c-be4f-dbd748bec074" processor="db:select">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Database_Config" attributeName="config-ref" />
+					<munit-tools:with-attribute whereValue="contactID" attributeName="target" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:variables >
+						<munit-tools:variable key="contactID" value='#[[{ "ID": 208 }  ]]' />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Insert Contact" doc:id="f61faebd-a4a1-4fc4-8317-1ccbf51c53c4" processor="db:insert">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Database_Config" attributeName="config-ref" />
+					<munit-tools:with-attribute whereValue="contact" attributeName="target" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:variables >
+						<munit-tools:variable key="contact" value="#[MunitTools::getResourceAsString('responses/insertResponse.json')]" mediaType="application/json" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Email" doc:id="925e830d-4062-4ace-8687-239a26445cc9" processor="db:insert">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Database_Config" attributeName="config-ref" />
+					<munit-tools:with-attribute whereValue="emailID" attributeName="target" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:variables >
+						<munit-tools:variable key="emailID" value="#[MunitTools::getResourceAsString('responses/insertResponse.json')]" mediaType="application/json" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="1225557a-ab09-41ce-b2b8-26c414614377" >
+				<munit:variables >
+					<munit:variable key="inputPayload" value="#[MunitTools::getResourceAsString('sample_data/contact_Request.json')]" mediaType="application/json" />
+					<munit:variable key="tid" value="#['Insert Contact']" />
+				</munit:variables>
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to iqvia-dtms-il2-sys-api-implFlow-insertContact" doc:id="e82700c2-83e7-4584-a138-8d91fa19654f" name="iqvia-dtms-il2-sys-api-implFlow-insertContact"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:verify-call doc:name="Verify call" doc:id="6dee5384-e1bb-4402-9b04-3111a966f181" processor="ee:transform" atLeast="1">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Transform Message" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="iqvia-dtms-il2-sys-api-impl-test-suite-iqvia-dtms-il2-sys-api-implFlow-insertSiteVisitParticipantTest" doc:id="9802a881-2d23-44c9-9cf4-666c2eebd231" description="Test" ignore="true">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="FlowRef" doc:id="1a1079db-f333-4454-b6bf-cd33526b1a4c" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="iqvia-dtms-il2-sys-api-implFlow-User" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:variables >
+						<munit-tools:variable key="users" value="#[MunitTools::getResourceAsString('responses/response_users.json')]" mediaType="application/json" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="SVP" doc:id="5be7e64b-6405-4b98-b912-71019509b48c" processor="db:select">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Database_Config" attributeName="config-ref" />
+					<munit-tools:with-attribute whereValue="svp" attributeName="target" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:variables >
+						<munit-tools:variable key="svp" value="#[MunitTools::getResourceAsString('responses/response_svp.json')]" mediaType="application/json" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Email" doc:id="d45b9c80-42b2-4846-9b56-7e470a0bbf24" processor="db:select">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Database_Config" attributeName="config-ref" />
+					<munit-tools:with-attribute whereValue="email" attributeName="target" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:variables >
+						<munit-tools:variable key="email" value='#[[{ "ID": 208 }  ]]' />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Protocol Site" doc:id="ab7bed19-336a-4984-b4ce-bf2a65c1c593" processor="db:select">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Database_Config" attributeName="config-ref" />
+					<munit-tools:with-attribute whereValue="protocolSite" attributeName="target" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:variables >
+						<munit-tools:variable key="protocolSite" value='#[[ { "ID" :1, "GLOBAL_SITE_ID" :1, "PROTOCOL_ID": 1 } ]]' mediaType="application/json" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="SVP Insert" doc:id="a1886a11-093d-4641-a9a1-1aef24f4e338" processor="db:insert">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Database_Config" attributeName="config-ref" />
+					<munit-tools:with-attribute whereValue="contactProtocolSite" attributeName="target" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:variables >
+						<munit-tools:variable key="contactProtocolSite" value="#[MunitTools::getResourceAsString('responses/insertResponse.json')]" mediaType="application/json" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="email Insert" doc:id="0d52728b-b19f-4f69-9c2e-6c3f732a960c" processor="db:insert">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Database_Config" attributeName="config-ref" />
+					<munit-tools:with-attribute whereValue="emailID" attributeName="target" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:variables >
+						<munit-tools:variable key="emailID" value="#[MunitTools::getResourceAsString('responses/insertResponse.json')]" mediaType="application/json" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="bbfb6475-5093-49e9-89cf-08356ce1890b" >
+				<munit:variables >
+					<munit:variable key="inputPayload" value="#[MunitTools::getResourceAsString('sample_data/siteVisitParticipant_Request.json')]" mediaType="application/json" />
+					<munit:variable key="tid" value="#['Insert SVP']" />
+				</munit:variables>
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to iqvia-dtms-il2-sys-api-implFlow-insertSiteVisitParticipant" doc:id="91e93bb2-1775-4508-b644-461e58827641" name="iqvia-dtms-il2-sys-api-implFlow-insertSiteVisitParticipant"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:verify-call doc:name="Verify call" doc:id="ca30768f-a41f-46d0-9a89-43205eea3e58" processor="ee:transform" atLeast="1">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Transform Message" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="iqvia-dtms-il2-sys-api-impl-test-suite-iqvia-dtms-il2-sys-api-implFlow-insertSiteVisitDocumentTest" doc:id="f41e5da2-2e34-430d-81ae-caab08050b1f" description="Test">
+		<munit:behavior>
+			<munit-tools:mock-when doc:name="DB-User" doc:id="34ef6fc0-d81f-42bc-8005-e41e35eb91d4" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="iqvia-dtms-il2-sys-api-implFlow-User" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Document" doc:id="c6796066-d125-4b4e-b40e-aa122a484af1" processor="db:select">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Database_Config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Attachment" doc:id="e147aa73-fc86-4230-9be9-7e1b32c11161" processor="db:insert">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Database_Config" attributeName="config-ref" />
+					<munit-tools:with-attribute whereValue="attachmentId" attributeName="target" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="RelatedSignatures" doc:id="73bfadcf-5ef4-4657-98c6-c149fb01b33b" processor="db:insert">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Database_Config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="WS-Integration" doc:id="29feb701-c190-4547-9cea-e49a688d2e11" processor="db:insert">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Database_Config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="94694e8c-303c-4ff7-82a3-1b6b8f1181cb" >
+				<munit:variables >
+					<munit:variable key="inputPayload" value="#[MunitTools::getResourceAsString('sample_data/siteVisitDocument_Request.json')]" mediaType="application/json" />
+				</munit:variables>
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to iqvia-dtms-il2-sys-api-implFlow-insertSiteVisitDocument" doc:id="ac8724d1-f3de-4e79-8529-3d586ad101c8" name="iqvia-dtms-il2-sys-api-implFlow-insertSiteVisitDocument"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:verify-call doc:name="Verify call" doc:id="9f73979d-ebcb-4a03-a886-480e91dbb5c7" processor="ee:transform">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Transform Message" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="iqvia-dtms-il2-sys-api-impl-test-suite-iqvia-dtms-il2-sys-api-imp-SVR-FlowTest" doc:id="4e910b5a-a146-4423-b24a-0470335b3c71" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="db-User" doc:id="c78dc696-0a60-4bc7-a73f-ee349c2f3297" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="iqvia-dtms-il2-sys-api-implFlow-User" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="mvrTemplateId" doc:id="e9895c98-43dc-4111-9dba-1401512902a5" processor="db:select">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Database_Config" attributeName="config-ref" />
+					<munit-tools:with-attribute whereValue="templateId" attributeName="target" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="mvReport" doc:id="9399c307-84c0-49ba-8ff5-4f2ec3ce99c4" processor="db:insert">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="MonitoringVisitReport" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="Database_Config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="wsIntegration" doc:id="c516ba8c-0488-4c6a-ba53-f18a47fb6fc1" processor="db:insert">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Database_Config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="80fb9438-c37a-4e8c-bac1-77349af86a19" processor="db:insert">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Mvr-Report-Signatures" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="Database_Config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="45561187-e034-44f3-8cfb-2b492843224f" >
+				<munit:variables >
+					<munit:variable key="inputPayload" value="#[MunitTools::getResourceAsString('sample_data/siteVisitReport_Request.json')]" mediaType="application/json" />
+				</munit:variables>
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to iqvia-dtms-il2-sys-api-imp-SVR-Flow" doc:id="e8410e5f-3e66-463b-818f-b886f7693215" name="iqvia-dtms-il2-sys-api-imp-SVR-Flow"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:verify-call doc:name="Verify call" doc:id="3fd594e9-f976-45c5-bf88-2c8354156424" processor="ee:transform">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Transform Message" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+		</munit:validation>
+	</munit:test>
+
+
+
+</mule>

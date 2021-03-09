@@ -1,0 +1,59 @@
+#%RAML 1.0 NamedExample
+type: object
+description: 'Defines structure of Site Visit Report request'
+properties:
+  lastUser:
+    type: integer
+    required: true
+  monitoringVisitId:
+    type: integer
+    required: true
+  entityId:
+    type: integer
+    required: true
+    enum:
+      - 0
+  migrationDate:
+    type: datetime
+    required: true
+  dateSigned:
+    type: datetime
+    required: true
+  dateSignedUser:
+    type: datetime
+    required: true
+  objectType:
+    type: string
+    required: true
+  lastMvrUser:
+    type: integer
+    required: true
+  reportIteration:
+    type: integer
+    required: true
+  dateUploadedToWs:
+    type: datetime
+    required: true
+  retries:                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  
+    type: integer
+    required: true
+    enum:
+      - 0 
+  status:
+    type: string
+    required: true
+  reportStatus:
+    type: integer
+    required: true
+  signAction:
+    type: string                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+    required: true
+  relatedType:                                                                                                                                                                                                                                                                                                                    
+    type: string
+    required: true
+  wsUrl:
+    type: string
+    required: true
+  recordStatus:
+    type: integer
+    required: true

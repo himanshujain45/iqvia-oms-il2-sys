@@ -1,0 +1,141 @@
+#%RAML 1.0
+title: iqvia-dtms-il2-sys-api
+version: 1.0
+baseUri: https://iqvia-dtms-oms-il2-sys-1-0-dev.us-e1.cloudhub.io/api
+
+
+mediaType: application/json
+protocols:
+  - HTTPS
+traits:
+  headers-required: !include traits/trait.raml
+
+resourceTypes:
+  DtmsBasicResource : !include resourceTypes/DtmsRESTOperations.raml
+types:
+  UpdateActionItem: !include dataTypes/UpdateActionItem.raml
+  CreateActionItem: !include dataTypes/CreateActionItem.raml
+  CreateContact: !include dataTypes/CreateContact.raml
+  CreateSVP: !include dataTypes/CreateSVP.raml
+  UpdateSiteVisit: !include dataTypes/UpdateSiteVisit.raml
+  CreateSiteVisit: !include dataTypes/CreateSiteVisit.raml
+  UpdateProtocolDeviation: !include dataTypes/UpdateProtocolDeviation.raml
+  CreateProtocolDeviation: !include dataTypes/CreateProtocolDeviation.raml
+  ErrorResponse: !include dataTypes/ErrorResponse.raml
+  SuccessReponse: !include dataTypes/SuccessResponse.raml
+  CreateSVD: !include dataTypes/SiteVisitDocument.raml
+  CreateSVR: !include dataTypes/SiteVisitReport.raml
+  
+  
+
+/sitevisitDocument:
+  is: [headers-required]
+  type: { DtmsBasicResource:
+        { ObjectNamePOST: "sitevisitDocument",  
+          ObjectTypeNamePOST: "CreateSVD",
+           
+          SuccessResponseTypeNamePOST: "SuccessReponse",
+          ErrorResponseTypeName: "ErrorResponse"} }
+  post:
+     body:
+      application/json:
+        example: !include examples/SVD.raml
+     
+  
+/actionItem:
+  is: [headers-required]
+  type: { DtmsBasicResource:
+        { ObjectNamePOST: "Action Item",  
+          ObjectTypeNamePOST: "CreateActionItem",
+          ObjectNamePUT: "Action Item", 
+          ObjectTypeNamePUT: "UpdateActionItem",
+          SuccessResponseTypeNamePOST: "SuccessReponse",
+          SuccessResponseTypeNamePUT: "SuccessReponse",
+          ErrorResponseTypeName: "ErrorResponse"} } 
+  post:
+    body:
+      application/json:
+        example: !include examples/ActionItem.raml
+    
+  put:
+    body:
+      application/json:
+        example: !include examples/ActionItem.raml
+        
+/siteVisit:
+  is: [headers-required]
+  type: { DtmsBasicResource: 
+        { ObjectNamePOST: "Site Visit",  
+          ObjectTypeNamePOST: "CreateSiteVisit",
+          ObjectNamePUT: "Site Visit", 
+          ObjectTypeNamePUT: "UpdateSiteVisit",
+          SuccessResponseTypeNamePOST: "SuccessReponse",
+          SuccessResponseTypeNamePUT: "SuccessReponse",
+          ErrorResponseTypeName: "ErrorResponse"} } 
+  post:
+    body:
+      application/json:
+        example: !include examples/SiteVisit.raml
+
+  put:
+    body:
+      application/json:
+        example: !include examples/SiteVisit.raml
+
+/protocolDeviation:
+  is: [headers-required]
+  type: { DtmsBasicResource: 
+        { ObjectNamePOST: "Protocol Deviation",  
+          ObjectTypeNamePOST: "CreateProtocolDeviation",
+          ObjectNamePUT: "Protocol Deviation",
+          ObjectTypeNamePUT: "UpdateProtocolDeviation",
+          SuccessResponseTypeNamePOST: "SuccessReponse",
+          SuccessResponseTypeNamePUT: "SuccessReponse",
+          ErrorResponseTypeName: "ErrorResponse"} } 
+  post:
+    body:
+      application/json:
+        example: !include examples/ProtocolDeviation.raml
+
+  put:
+    body:
+      application/json:
+        example: !include examples/ProtocolDeviation.raml
+
+/contact:
+  is: [headers-required]
+  type: { DtmsBasicResource:
+        { ObjectNamePOST: "Contact",
+          ObjectTypeNamePOST: "CreateContact",
+          SuccessResponseTypeNamePOST: "SuccessReponse",
+          ErrorResponseTypeName: "ErrorResponse"} } 
+  post:
+    body:
+      application/json:
+        example: !include examples/Contact.raml
+
+/siteVisitParticipant:
+  is: [headers-required]
+  type: { DtmsBasicResource:
+        { ObjectNamePOST: "SVP",
+          ObjectTypeNamePOST: "CreateSVP",
+          SuccessResponseTypeNamePOST: "SuccessReponse",
+          ErrorResponseTypeName: "ErrorResponse"} } 
+  post:
+    body:
+      application/json:
+        example: !include examples/SVP.raml
+        
+/siteVisitReport:
+  is: [headers-required]
+  type: { DtmsBasicResource:
+        { ObjectNamePOST: "SiteVisitReport",
+          ObjectTypeNamePOST: "CreateSVR",
+          SuccessResponseTypeNamePOST: "SuccessReponse",
+          ErrorResponseTypeName: "ErrorResponse" } }
+          
+  post:
+     body:
+       application/json:
+         example: !include examples/SVR.raml
+       

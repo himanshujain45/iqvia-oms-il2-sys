@@ -1,0 +1,19 @@
+{
+"studyIssueID": 4219,
+"occuranceDate": "2016-02-28T16:41:41.090Z",
+"dateClosed": "2016-02-28T16:41:41.090Z",
+"followUpDate": "2016-02-28T16:41:41.090Z",
+"comments": "Action Item",
+"studyIssueTypeName": "CA/EC/IRB",
+"notes": "test",
+"studyIssueStatusName": "Opened",
+"protocolId": 1082,
+"protocolSiteId": 421967,
+"entityId": 0,
+"recordStatus" : 0,
+"allowOMVRUpdates": 1,
+"recordLocked": 1,
+"dateCreated": "2016-02-28T16:41:41.090Z",
+"dateStart": "2016-02-28T16:41:41.090Z",
+"lastUser": 4
+}

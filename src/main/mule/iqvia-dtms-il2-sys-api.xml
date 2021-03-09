@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:iqvia="http://www.mulesoft.org/schema/mule/iqvia" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd  http://www.mulesoft.org/schema/mule/iqvia http://www.mulesoft.org/schema/mule/iqvia/current/mule-iqvia.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+    <apikit:config name="iqvia-dtms-il2-sys-api-config" api="iqvia-dtms-il2-sys-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="3462ba72-9b97-40b2-b91e-4403f2edf456" >
+		<http:listener-connection host="0.0.0.0" port="8084" />
+	</http:listener-config>
+	<flow name="iqvia-dtms-il2-sys-api-main">
+        <http:listener config-ref="HttpsListenerConfig" path="/api/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers><![CDATA[#[(vars.outboundHeaders default {}) ++ ("TID" : vars.tid)]]]></http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body><![CDATA[#[payload]]]></http:body>
+                <http:headers><![CDATA[#[(vars.outboundHeaders default {}) ++ ("TID" : vars.tid)]]]></http:headers>
+            </http:error-response>
+        </http:listener>
+        <ee:transform doc:name="Set Variables" doc:id="e5d08169-1b7b-4f38-8d77-898d117b7dc6">
+            <ee:message />
+            <ee:variables>
+                <ee:set-variable variableName="inputPayload"><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-variable>
+                <ee:set-variable variableName="tid"><![CDATA[attributes.headers.tid default correlationId]]></ee:set-variable>
+                <ee:set-variable variableName="dbConnection"><![CDATA[%dw 2.0
+output application/json
+---
+read(attributes.headers.dbConnection default '', "application/json")]]></ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <iqvia:log-entries doc:name="Log entries" doc:id="a80ae731-1dd7-49f1-97d4-cb7d40a36955" config-ref="IQVIA_Logging_Connector_Config" eventName="Request received on system layer" meta="#[{&quot;Callflow&quot;:&quot;Inbound&quot;,&quot;Calltype&quot;:&quot;Request&quot;,&quot;Parameters&quot;:attributes.'QueryParameters',&quot;Method&quot;:attributes.'Method',&quot;Requestor-Nodename&quot;:attributes.'RemoteAddress',&quot;Endpoint&quot;:attributes.'Scheme'++&quot;://&quot;++ attributes.'Headers'.'host',&quot;Host&quot;:attributes.'Headers'.'host',&quot;Content-Length&quot;:attributes.'Headers'.'content-length',&quot;Resource&quot;:attributes.'RequestUri'}]" transactionId="#[vars.tid]" />
+        <apikit:router config-ref="iqvia-dtms-il2-sys-api-config" />
+		<error-handler ref="apiKit_Handler" />
+    </flow>
+    <flow name="iqvia-dtms-il2-sys-api-console">
+        <http:listener config-ref="HttpsListenerConfig" path="/console/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[(vars.outboundHeaders default {}) ++ ("TID" : vars.tid)]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[(vars.outboundHeaders default {}) ++ ("TID" : vars.tid)]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:console config-ref="iqvia-dtms-il2-sys-api-config" />
+        <error-handler ref="apiKit_Handler" />
+    </flow>
+    <flow name="put:\actionItem:application\json:iqvia-dtms-il2-sys-api-config">
+        <flow-ref doc:name="updateActionItem" doc:id="129afc71-e622-4e70-bbe3-35492a80dd02" name="iqvia-dtms-il2-sys-api-implFlow-updateActionItem" />
+    </flow>
+    <flow name="post:\actionItem:application\json:iqvia-dtms-il2-sys-api-config">
+        <flow-ref doc:name="insertActionItem" doc:id="f72bfad9-e3fb-4442-8137-5400e04111ad" name="iqvia-dtms-il2-sys-api-implFlow-insertActionItem" />
+    </flow>
+    <flow name="put:\protocolDeviation:application\json:iqvia-dtms-il2-sys-api-config">
+        <flow-ref doc:name="updateProtocolDeviation" doc:id="a70e64c2-54ed-4db5-a05a-97c3b0f5147f" name="iqvia-dtms-il2-sys-api-implFlow-updateProtocolDev" />
+    </flow>
+    <flow name="post:\protocolDeviation:application\json:iqvia-dtms-il2-sys-api-config">
+        <flow-ref doc:name="insertProtocolDeviation" doc:id="77deeadc-c5b4-4344-8d84-191ebc792b98" name="iqvia-dtms-il2-sys-api-implFlow-insertProtocolDev" />
+    </flow>
+    <flow name="put:\siteVisit:application\json:iqvia-dtms-il2-sys-api-config">
+        <flow-ref doc:name="updateSiteVisit" doc:id="5c62d8c2-8c55-4417-b92c-b798ea466e48" name="iqvia-dtms-il2-sys-api-implFlow-updateSiteVisit" />
+    </flow>
+    <flow name="post:\siteVisit:application\json:iqvia-dtms-il2-sys-api-config">
+        <flow-ref doc:name="insertSiteVisit" doc:id="01e72753-be74-4459-aff2-17a25a9cd94a" name="iqvia-dtms-il2-sys-api-implFlow-insertSiteVisit" />
+    </flow>
+    <flow name="post:\contact:application\json:iqvia-dtms-il2-sys-api-config">
+        <flow-ref doc:name="insertContact" doc:id="756e0277-f5bc-424c-a6e2-75804f1eccaa" name="iqvia-dtms-il2-sys-api-implFlow-insertContact" />
+    </flow>
+    <flow name="post:\siteVisitParticipant:application\json:iqvia-dtms-il2-sys-api-config">
+        <flow-ref doc:name="insertSVP" doc:id="48f0720d-b876-4640-ac65-002f6aadebdc" name="iqvia-dtms-il2-sys-api-implFlow-insertSiteVisitParticipant" />
+    </flow>
+    <flow name="post:\sitevisitDocument:application\json:iqvia-dtms-il2-sys-api-config">
+        <flow-ref doc:name="site-visit-doc-impl-ref-to" doc:id="66e2eef8-dc53-411f-9b25-f5b3196daf11" name="iqvia-dtms-il2-sys-api-implFlow-insertSiteVisitDocument" />
+    </flow>
+    <flow name="post:\siteVisitReport:application\json:iqvia-dtms-il2-sys-api-config">
+        <logger level="INFO" message="post:\siteVisitReport:application\json:iqvia-dtms-il2-sys-api-config" />
+		<flow-ref doc:name="Flow Reference" doc:id="29f8941c-39d5-4dd0-80aa-91be3c4a57e6" name="iqvia-dtms-il2-sys-api-imp-SVR-Flow"/>
+    </flow>
+	
+	
+	
+</mule>

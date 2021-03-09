@@ -1,0 +1,496 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:validation="http://www.mulesoft.org/schema/mule/validation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:iqvia="http://www.mulesoft.org/schema/mule/iqvia"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/iqvia http://www.mulesoft.org/schema/mule/iqvia/current/mule-iqvia.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd">
+	<sub-flow name="iqvia-dtms-il2-sys-api-implFlow-insertActionItem" doc:id="30967107-be7a-4306-b9d2-8b7544b93c90" >
+		<iqvia:log-entries doc:name="Log entries" doc:id="989f3a62-8378-4eb9-ac72-00aaf50de5ef" config-ref="IQVIA_Logging_Connector_Config" meta='#[{"Callflow":"Outbound","Calltype":"Request","API-Hostname":server.host,"DB-Server-Name":attributes.headers.dbhost,"DB-Instance":attributes.headers.dbdatabase, "DB-Request":"db.actionItem.insert"}]' eventName="Begin ActionItem-Insert" transactionId="#[vars.tid]"/>
+		<try doc:name="Try" doc:id="eae59a2a-9b30-4643-9ce7-7f56bfe607ad" transactionalAction="ALWAYS_BEGIN">
+			<flow-ref doc:name="iqvia-dtms-il2-sys-api-implFlow-User" doc:id="f53ca6b0-ba4f-4436-92d9-9c3a59587e1f" name="iqvia-dtms-il2-sys-api-implFlow-User"/>
+			<db:select doc:name="StatusID" doc:id="1791c6cc-24bd-4e5c-a48f-aa2cddfd8e65" config-ref="Database_Config" transactionalAction="ALWAYS_JOIN" target="studyIssueStatusID">
+				<db:sql ><![CDATA[#[ p('secure::db.actionItem.status')]]]></db:sql>
+				<db:input-parameters ><![CDATA[#[{NAME: vars.inputPayload.studyIssueStatusName}]]]></db:input-parameters>
+			</db:select>
+			<db:select doc:name="TypeID" doc:id="e2a06b49-f7c2-4af1-8192-12894b58db3f" transactionalAction="ALWAYS_JOIN" target="studyIssueTypeID" config-ref="Database_Config">
+				<db:sql ><![CDATA[#[ p('secure::db.actionItem.type')]]]></db:sql>
+				<db:input-parameters ><![CDATA[#[{NAME: vars.inputPayload.studyIssueTypeName, PROTOCOL_ID: vars.inputPayload.protocolId}]]]></db:input-parameters>
+			</db:select>
+			<validation:all doc:name="All" doc:id="413fa4a8-c242-4aaf-9b6c-b20dd3f93dbd" >
+				<validation:is-not-null doc:name="Status ID" doc:id="59b8290d-84da-4f9d-a3c7-677f48530deb" value="#[vars.studyIssueStatusID[0].ID]" config-ref="Validation_Config" message="studyIssueStatusID field is NULL"/>
+				<validation:is-not-null doc:name="Type ID" doc:id="0fdfbb1f-54f2-489a-9a5b-6d75f8001086" config-ref="Validation_Config" value="#[vars.studyIssueTypeID[0].ID]" message="studyIssueTypeID is NULL"/>
+			</validation:all>
+			<db:insert doc:name="ActionItem" doc:id="79348d73-efdc-4a35-9be7-018123095979" transactionalAction="ALWAYS_JOIN" autoGenerateKeys="true" config-ref="Database_Config">
+				<db:sql ><![CDATA[#[ p('secure::db.actionItem.insert')]]]></db:sql>
+				<db:input-parameters ><![CDATA[#[${file::actionItem/insActionItem.dwl}]]]></db:input-parameters>
+			</db:insert>
+			<ee:transform doc:name="JSON payload" doc:id="7f68757c-d43e-478d-ad98-ec328716be1f" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+		</try>
+		<iqvia:log-entries doc:name="Log entries" doc:id="5926f6a7-8ebc-4efa-ab72-13699e5315b0" config-ref="IQVIA_Logging_Connector_Config" meta='#[{"Callflow":"Outbound","Calltype":"Response","Response-Code":"200","Error-Msg":"None","Response-Size":payload.affectedRows,"KB":"none"}]' transactionId="#[vars.tid]" eventName="End ActionItem-Insert"/>
+	</sub-flow>
+	<sub-flow name="iqvia-dtms-il2-sys-api-implFlow-updateActionItem" doc:id="ef5f76b9-0424-47fe-95ce-ddfb99aef561" >
+		<iqvia:log-entries doc:name="Log entries" doc:id="9e82f4ea-977d-4e5c-b463-221eab107fcc" config-ref="IQVIA_Logging_Connector_Config" meta='#[{"Callflow":"Outbound","Calltype":"Request","API-Hostname":server.host,"DB-Server-Name":attributes.headers.dbhost,"DB-Instance":attributes.headers.dbdatabase, "DB-Request":"db.actionItem.update"}]' eventName="Begin ActionItem-Insert" transactionId="#[vars.tid]"/>
+		<try doc:name="Try" doc:id="42c1af65-8511-4357-9a19-267dc7dac683" transactionalAction="ALWAYS_BEGIN">
+			<flow-ref doc:name="iqvia-dtms-il2-sys-api-implFlow-User" doc:id="89e08b96-5c00-4c17-89f6-0e55fff70fc6" name="iqvia-dtms-il2-sys-api-implFlow-User"/>
+			<db:select doc:name="Status ID" doc:id="77a2708a-20b4-41ed-96b6-bb58df95c85f" config-ref="Database_Config" transactionalAction="ALWAYS_JOIN" target="studyIssueStatusID">
+				<db:sql ><![CDATA[#[ p('secure::db.actionItem.status')]]]></db:sql>
+				<db:input-parameters ><![CDATA[#[{NAME:vars.inputPayload.studyIssueStatusName}]]]></db:input-parameters>
+			</db:select>
+			<db:select doc:name="Type ID" doc:id="06876685-f0fc-40e0-a4fb-a03e707a7c42" transactionalAction="ALWAYS_JOIN" target="studyIssueTypeID" config-ref="Database_Config">
+				<db:sql ><![CDATA[#[ p('secure::db.actionItem.type')]]]></db:sql>
+				<db:input-parameters ><![CDATA[#[{NAME: vars.inputPayload.studyIssueTypeName, PROTOCOL_ID: vars.inputPayload.protocolId}]]]></db:input-parameters>
+			</db:select>
+			<validation:all doc:name="All" doc:id="8f40945a-1224-43bc-ae89-0f9573be3cf0" >
+				<validation:is-not-null doc:name="Status ID" doc:id="4186d402-c732-41b6-bb1b-0b2617f97c44" value="#[vars.studyIssueStatusID[0].ID]" config-ref="Validation_Config" message="studyIssueStatusID field is NULL"/>
+				<validation:is-not-null doc:name="Type ID" doc:id="0c31dfd7-065c-4168-b833-3b9d2384a82d" config-ref="Validation_Config" value="#[vars.studyIssueTypeID[0].ID]" message="studyIssueTypeID is NULL"/>
+			</validation:all>
+			<db:update doc:name="Action Item" doc:id="2269af2f-fe82-4842-9ae0-ee80a8cb8311" config-ref="Database_Config" transactionalAction="ALWAYS_JOIN">
+				<db:sql ><![CDATA[#[ p('secure::db.actionItem.update')]]]></db:sql>
+				<db:input-parameters ><![CDATA[#[${file::actionItem/updActionItem.dwl}]]]></db:input-parameters>
+			</db:update>
+			<ee:transform doc:name="JSON payload" doc:id="bc7804c5-a767-4600-bd3a-cf76205dfe1c" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+				</ee:message>
+</ee:transform>
+		</try>
+		<iqvia:log-entries doc:name="Log entries" doc:id="d0790dd4-4d26-4a5e-a44d-0aa22cf6785d" config-ref="IQVIA_Logging_Connector_Config" meta='#[{"Callflow":"Outbound","Calltype":"Response","Response-Code":"200","Error-Msg":"None","Response-Size":payload.affectedRows,"KB":"none"}]' transactionId="#[vars.tid]" eventName="End ActionItem-Insert"/>
+	</sub-flow>
+	<sub-flow name="iqvia-dtms-il2-sys-api-implFlow-insertSiteVisit" doc:id="acc57801-6cff-4ff0-9d59-e0bbfeac3dde" >
+	<iqvia:log-entries doc:name="Log entries" doc:id="a9652140-d489-4205-9f31-f6fba9cbca27" config-ref="IQVIA_Logging_Connector_Config" eventName="Begin SiteVisit-Insert" meta='#[{"Callflow":"Outbound","Calltype":"Request","API-Hostname":server.host,"DB-Server-Name":attributes.headers.dbhost,"DB-Instance":attributes.headers.dbdatabase, "DB-Request":"db.SiteVisit.insert"}]' transactionId="#[vars.tid]"/>
+	<try doc:name="Try" doc:id="d282ba17-4371-4cba-8204-f5b51b16ae8f" transactionalAction="ALWAYS_BEGIN">
+			<flow-ref doc:name="iqvia-dtms-il2-sys-api-implFlow-User" doc:id="146284c1-db34-469d-95ad-509b39fa989a" name="iqvia-dtms-il2-sys-api-implFlow-User"/>
+			<db:insert doc:name="Monitoring Visit" doc:id="d77ed797-bee9-4772-8492-f030acb89159" config-ref="Database_Config" target="monitoringVisit" autoGenerateKeys="true" transactionalAction="ALWAYS_JOIN">
+				<db:sql ><![CDATA[#[ p('secure::db.siteVisit.visitIns')]]]></db:sql>
+				<db:input-parameters ><![CDATA[#[${file::siteVisit/insMonitoringVisit.dwl}]]]></db:input-parameters>
+			</db:insert>
+			<db:select doc:name="Contact ID" doc:id="2f3b700e-f3f0-407a-bba1-69f6b889b2ea" config-ref="Database_Config" target="contact" transactionalAction="ALWAYS_JOIN">
+				<db:sql ><![CDATA[#[ p('secure::db.siteVisit.contactSel')]]]></db:sql>
+				<db:input-parameters ><![CDATA[#[{CONTACT_ID: vars.inputPayload.contactID, PROTOCOL_SITE_ID: vars.inputPayload.protocolSiteID}]]]></db:input-parameters>
+			</db:select>
+			<db:insert doc:name="Monitoring Visit Contact" doc:id="f2ed60e1-f543-4f0e-81e6-521b7dde7812" config-ref="Database_Config" autoGenerateKeys="true" transactionalAction="ALWAYS_JOIN">
+				<db:sql ><![CDATA[#[ p('secure::db.siteVisit.contactIns')]]]></db:sql>
+				<db:input-parameters ><![CDATA[#[${file::siteVisit/insMonitoringVisitContact.dwl}]]]></db:input-parameters>
+			</db:insert>
+			<db:insert doc:name="Document Confirmation" doc:id="3f60a475-71ea-47bf-9caa-08362bb81ce8" config-ref="Database_Config" autoGenerateKeys="true" transactionalAction="ALWAYS_JOIN">
+				<db:sql ><![CDATA[#[ p('secure::db.siteVisit.documentIns')]]]></db:sql>
+				<db:input-parameters ><![CDATA[#[${file::siteVisit/insDocumentConf.dwl}]]]></db:input-parameters>
+			</db:insert>
+			<db:insert doc:name="Document FollowUp" doc:id="312e1f32-332f-4a62-81e0-8b23887a3487" config-ref="Database_Config" autoGenerateKeys="true" transactionalAction="ALWAYS_JOIN">
+				<db:sql ><![CDATA[#[ p('secure::db.siteVisit.documentIns')]]]></db:sql>
+				<db:input-parameters ><![CDATA[#[${file::siteVisit/insDocumentFlwUp.dwl}]]]></db:input-parameters>
+			</db:insert>
+			<ee:transform doc:name="JSON payload" doc:id="721b0061-8aeb-4c1e-8acd-4895186baa3d" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+vars.monitoringVisit]]></ee:set-payload>
+				</ee:message>
+</ee:transform>
+		</try>
+		<iqvia:log-entries doc:name="Log entries" doc:id="4a4033b5-b22e-4d5d-abaa-cfbd15db4ec7" config-ref="IQVIA_Logging_Connector_Config" meta='#[{"Callflow":"Outbound","Calltype":"Response","Response-Code":"200","Error-Msg":"None","Response-Size":payload.affectedRows,"KB":"none"}]' eventName="End - SiteVisit- Insert" transactionId="#[vars.tid]"/>
+	</sub-flow>	
+	<sub-flow name="iqvia-dtms-il2-sys-api-implFlow-updateSiteVisit" doc:id="306b6334-c79b-48c1-9c75-b3c95dd7795b" >
+	<iqvia:log-entries doc:name="Log entries" doc:id="f1a359a4-4465-4e7c-b2b7-5fead9143c44" config-ref="IQVIA_Logging_Connector_Config" eventName="Begin - SiteVisit - Update" meta='#[{"Callflow":"Outbound","Calltype":"Request","API-Hostname":server.host,"DB-Server-Name":attributes.headers.dbhost,"DB-Instance":attributes.headers.dbdatabase, "DB-Request":"db.SiteVisit.insert"}]' transactionId="#[vars.tid]"/>
+	<try doc:name="Try" doc:id="8075d2d8-8964-451a-a4ad-6fcf92e27d61" transactionalAction="ALWAYS_BEGIN">
+			<flow-ref doc:name="iqvia-dtms-il2-sys-api-implFlow-User" doc:id="6bd1300a-734d-462d-8a84-1892386170ef" name="iqvia-dtms-il2-sys-api-implFlow-User"/>
+			<db:select doc:name="Monitoring_Visit" doc:id="5fa3a09a-5251-49dd-adb3-54d609ab6346" config-ref="Database_Config" target="visitDate" transactionalAction="ALWAYS_JOIN">
+				<db:sql ><![CDATA[#[ p('secure::db.siteVisit.visitSel')]]]></db:sql>
+				<db:input-parameters ><![CDATA[#[{ID: vars.inputPayload.monitoringVisitID}]]]></db:input-parameters>
+			</db:select>
+			<db:update doc:name="Monitoring Visit" doc:id="653e251d-a3d7-4926-857b-e0515de6f364" config-ref="Database_Config" target="monitoringVisit" targetValue="#[output application/json --- payload]" transactionalAction="ALWAYS_JOIN">
+				<db:sql ><![CDATA[#[ p('secure::db.siteVisit.visitUpd')]]]></db:sql>
+				<db:input-parameters ><![CDATA[#[${file::siteVisit/updMonitoringVisit.dwl}]]]></db:input-parameters>
+			</db:update>
+			<db:select doc:name="Contact ID" doc:id="4ea91599-1ed4-4e3f-b8e9-dd825d5a0f7f" config-ref="Database_Config" target="contact" targetValue="#[output application/json --- payload]" transactionalAction="ALWAYS_JOIN">
+				<db:sql ><![CDATA[#[ p('secure::db.siteVisit.contactSel')]]]></db:sql>
+				<db:input-parameters ><![CDATA[#[{CONTACT_ID: vars.inputPayload.contactID, PROTOCOL_SITE_ID: vars.inputPayload.protocolSiteID}]]]></db:input-parameters>
+			</db:select>
+			<db:select doc:name="Contact ID Previous" doc:id="164e06b6-c088-4f52-baae-8a955973bf1b" config-ref="Database_Config" target="contactPrev" targetValue="#[output application/json --- payload]" transactionalAction="ALWAYS_JOIN">
+				<db:sql ><![CDATA[#[ p('secure::db.siteVisit.contactPrevSel')]]]></db:sql>
+				<db:input-parameters ><![CDATA[#[{MONITORING_VISIT_ID: vars.inputPayload.monitoringVisitID}]]]></db:input-parameters>
+			</db:select>
+			<choice doc:name="Choice" doc:id="0c5db356-0750-45dd-b491-67a6cf18a768" >
+				<when expression="#[vars.contactPrev[0].MONITORING_CONTACT_ID != vars.contact[0].ID]">
+					<db:update doc:name="Previous Contact" doc:id="53846bb1-0b21-4440-977f-71ddb10ca060" config-ref="Database_Config" transactionalAction="ALWAYS_JOIN">
+						<db:sql ><![CDATA[#[ p('secure::db.siteVisit.contactDel')]]]></db:sql>
+						<db:input-parameters ><![CDATA[#[${file::siteVisit/delMonitoringVisitContact.dwl}]]]></db:input-parameters>
+					</db:update>
+					<!-- <db:delete doc:name="Previous Contact" doc:id="28801a42-1ddd-482a-af76-8b7915a57f7b" config-ref="Database_Config" transactionalAction="ALWAYS_JOIN" targetValue="#[output application/json -&#45;&#45; payload]">
+						<db:sql ><![CDATA[#[ p('secure::db.siteVisit.contactDel')]]]></db:sql>
+						<db:input-parameters ><![CDATA[#[{MONITORING_VISIT_ID: vars.inputPayload.monitoringVisitID}]]]></db:input-parameters>
+					</db:delete> -->
+					<db:insert doc:name="Monitoring Visit Contact" doc:id="fc1f793d-4dc7-4085-80e2-f5631fbb934a" config-ref="Database_Config" transactionalAction="ALWAYS_JOIN">
+						<db:sql ><![CDATA[#[ p('secure::db.siteVisit.contactIns')]]]></db:sql>
+						<db:input-parameters ><![CDATA[#[${file::siteVisit/insMonitoringVisitContact.dwl}]]]></db:input-parameters>
+					</db:insert>
+				</when>
+				<otherwise >
+					<db:update doc:name="Monitoring Contact Visit" doc:id="1e551651-b674-4d32-ac9f-329a268fa919" config-ref="Database_Config" targetValue="#[output application/json --- payload]" transactionalAction="ALWAYS_JOIN">
+				<db:sql><![CDATA[#[ p('secure::db.siteVisit.contactUpd')]]]></db:sql>
+				<db:input-parameters><![CDATA[#[${file::siteVisit/updMonitoringVisitContact.dwl}]]]></db:input-parameters>
+			</db:update>
+				</otherwise>
+			</choice>
+			<db:update doc:name="Document Confirmation" doc:id="0ab7d269-a3e8-4db8-b7cf-1e8b61143caf" config-ref="Database_Config" targetValue="#[output application/json --- payload]" transactionalAction="ALWAYS_JOIN">
+				<db:sql ><![CDATA[#[ p('secure::db.siteVisit.documentUpd')]]]></db:sql>
+				<db:input-parameters ><![CDATA[#[${file::siteVisit/updDocumentConf.dwl}]]]></db:input-parameters>
+			</db:update>
+			<db:update doc:name="Document FollowUp" doc:id="1ea3e7af-f1a5-4dfa-8e3d-eee20cad14e5" config-ref="Database_Config" targetValue="#[output application/json --- payload]" transactionalAction="ALWAYS_JOIN">
+				<db:sql ><![CDATA[#[ p('secure::db.siteVisit.documentUpd')]]]></db:sql>
+				<db:input-parameters ><![CDATA[#[${file::siteVisit/updDocumentFlwUp.dwl}]]]></db:input-parameters>
+			</db:update>
+			<ee:transform doc:name="JSON payload" doc:id="2235f77c-cfd9-4caf-9455-77017107819e" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+vars.monitoringVisit]]></ee:set-payload>
+				</ee:message>
+</ee:transform>
+		</try>
+		<iqvia:log-entries doc:name="Log entries" doc:id="20bbfbfa-dedb-4254-bb10-35f960f247ea" config-ref="IQVIA_Logging_Connector_Config" eventName="End - SiteVisit - Update" meta='#[{"Callflow":"Outbound","Calltype":"Response","Response-Code":"200","Error-Msg":"None","Response-Size":payload.affectedRows,"KB":"none"}]' transactionId="#[vars.tid]"/>
+	</sub-flow>
+	<sub-flow name="iqvia-dtms-il2-sys-api-implFlow-insertProtocolDev" doc:id="ccda7bd3-0b17-44e7-af30-e9f403706159" >
+	<iqvia:log-entries doc:name="Log entries" doc:id="e6bc2b0f-a517-4b76-ac5d-18c4c66a2c26" config-ref="IQVIA_Logging_Connector_Config" transactionId="#[vars.tid]" eventName="Begin Protocol Deviation - Insert" meta='#[{"Callflow":"Outbound","Calltype":"Request","API-Hostname":server.host,"DB-Server-Name":attributes.headers.dbhost,"DB-Instance":attributes.headers.dbdatabase, "DB-Request":"db.ProtocolDeviation.insert"}]'/>
+	<try doc:name="Try" doc:id="3664c26a-39ca-42f3-97e0-24c4820a692f" transactionalAction="ALWAYS_BEGIN">
+			<flow-ref doc:name="iqvia-dtms-il2-sys-api-implFlow-User" doc:id="acc6dd2a-f7c1-49f1-b361-938c588ec049" name="iqvia-dtms-il2-sys-api-implFlow-User"/>
+			<db:select doc:name="PD Category ID" doc:id="9e77cf49-7fec-4a75-bbd5-da8b3c3a0709" config-ref="Database_Config" transactionalAction="ALWAYS_JOIN" target="pdCategoryID">
+				<db:sql ><![CDATA[#[ p('secure::db.protocolDeviation.pdCategory')]]]></db:sql>
+				<db:input-parameters ><![CDATA[#[{NAME: vars.inputPayload.pdCategoryName, PROTOCOL_ID: vars.inputPayload.protocolId}]]]></db:input-parameters>
+			</db:select>
+			<db:select doc:name="PD Follow Up Action ID" doc:id="836935d5-df35-4ec6-b86a-3dc52a6616d2" config-ref="Database_Config" target="pdFollowUpActionID" transactionalAction="ALWAYS_JOIN">
+				<db:sql ><![CDATA[#[ p('secure::db.protocolDeviation.pdFollowUpAction')]]]></db:sql>
+				<db:input-parameters ><![CDATA[#[{NAME: vars.inputPayload.pdFollowUpActionName, PROTOCOL_ID: vars.inputPayload.protocolId}]]]></db:input-parameters>
+			</db:select>
+			<db:insert doc:name="Protocol Deviation" doc:id="3c0e0a1d-cd29-447e-8e48-5d9f45b7a861" config-ref="Database_Config" transactionalAction="ALWAYS_JOIN" autoGenerateKeys="true" target="protocolDeviationID">
+				<db:sql ><![CDATA[#[ p('secure::db.protocolDeviation.deviationIns')]]]></db:sql>
+				<db:input-parameters ><![CDATA[#[${file::protocolDeviation/insProtocolDeviation.dwl}]]]></db:input-parameters>
+			</db:insert>
+			<db:insert doc:name="PD Site" doc:id="48953b7e-a0ea-4e51-b532-d79cade058a1" config-ref="Database_Config" transactionalAction="ALWAYS_JOIN" autoGenerateKeys="true" target="pdSiteID">
+				<db:sql ><![CDATA[#[ p('secure::db.protocolDeviation.pdSiteIns')]]]></db:sql>
+				<db:input-parameters ><![CDATA[#[${file::protocolDeviation/insPdSite.dwl}]]]></db:input-parameters>
+			</db:insert>
+			<choice doc:name="Choice" doc:id="53127bd8-bb9d-4a06-94f5-d52498918904" >
+				<when expression="#[vars.inputPayload.noSubjectAssociated == 0]">
+					<db:insert doc:name="PD Site Patient" doc:id="7d5cb437-c0e8-43b2-8200-46dd494b8ca3" config-ref="Database_Config" transactionalAction="ALWAYS_JOIN">
+				<db:sql><![CDATA[#[ p('secure::db.protocolDeviation.pdSitePatientIns')]]]></db:sql>
+				<db:input-parameters><![CDATA[#[${file::protocolDeviation/insPdSitePatient.dwl}]]]></db:input-parameters>
+			</db:insert>
+				</when>
+				<otherwise >
+					<logger level="INFO" doc:name="Logger" doc:id="ce6fc0a1-3c7c-4b02-9936-76479d6036ec" message="#['PD_SITE_PATIENT: No records to insert']"/>
+				</otherwise>
+			</choice>
+			<ee:transform doc:name="JSON Payload" doc:id="47b43035-403b-4f75-915a-265d8b819553">
+				<ee:message>
+					<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+vars.protocolDeviationID]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+		
+</try>
+		<iqvia:log-entries doc:name="Log entries" doc:id="8d5f2316-42c2-49dd-9141-726e3f5ff042" config-ref="IQVIA_Logging_Connector_Config" transactionId="#[vars.tid]" eventName="End Protocol Deviation _ Insert" meta='#[{"Callflow":"Outbound","Calltype":"Response","Response-Code":"200","Error-Msg":"None","Response-Size":payload.affectedRows,"KB":"none"}]'/>
+	</sub-flow>
+	<sub-flow name="iqvia-dtms-il2-sys-api-implFlow-updateProtocolDev" doc:id="aeda66a4-de11-403c-904f-29854ad9ba65" >
+	<iqvia:log-entries doc:name="Log entries" doc:id="2cde5c4d-0880-415d-b394-3c36fd68b16f" config-ref="IQVIA_Logging_Connector_Config" transactionId="#[vars.tid]" eventName="Begin Protocol Deviation - Insert" meta='#[{"Callflow":"Outbound","Calltype":"Request","API-Hostname":server.host,"DB-Server-Name":attributes.headers.dbhost,"DB-Instance":attributes.headers.dbdatabase, "DB-Request":"db.ProtocolDeviation.update"}]'/>
+	<try doc:name="Try" doc:id="27c3e88e-0298-49e5-868e-d7df5abe65c4" transactionalAction="ALWAYS_BEGIN">
+			<flow-ref doc:name="iqvia-dtms-il2-sys-api-implFlow-User" doc:id="f36b83ea-4a52-4b0b-a2b1-8dffaacea30a" name="iqvia-dtms-il2-sys-api-implFlow-User"/>
+			<db:select doc:name="PD Category" doc:id="7ddd34b4-9975-4abe-8d00-c8fb5ef974f6" config-ref="Database_Config" transactionalAction="ALWAYS_JOIN" target="pdCategoryID">
+				<db:sql ><![CDATA[#[ p('secure::db.protocolDeviation.pdCategory')]]]></db:sql>
+				<db:input-parameters ><![CDATA[#[{NAME: vars.inputPayload.pdCategoryName, PROTOCOL_ID: vars.inputPayload.protocolId}]]]></db:input-parameters>
+			</db:select>
+			<db:select doc:name="PD Follow Up Action" doc:id="13efe248-c888-4adc-abbe-e4d64f45c352" config-ref="Database_Config" target="pdFollowUpActionID" transactionalAction="ALWAYS_JOIN">
+				<db:sql ><![CDATA[#[ p('secure::db.protocolDeviation.pdFollowUpAction')]]]></db:sql>
+				<db:input-parameters ><![CDATA[#[{NAME: vars.inputPayload.pdFollowUpActionName, PROTOCOL_ID: vars.inputPayload.protocolId}]]]></db:input-parameters>
+			</db:select>
+			<db:select doc:name="PD Site" doc:id="bdfe4330-2dc8-4e8a-b7aa-549efe75aed5" config-ref="Database_Config" target="pdSite" transactionalAction="ALWAYS_JOIN">
+				<db:sql >#[ p('secure::db.protocolDeviation.siteSel')]</db:sql>
+				<db:input-parameters ><![CDATA[#[{PROTOCOL_DEVIATION_ID: vars.inputPayload.pdDeviationId}]]]></db:input-parameters>
+			</db:select>
+			<validation:all doc:name="All" doc:id="39ab15c7-8d9a-480a-91ef-6c1a2c253c5c">
+				<validation:is-not-null doc:name="PD Site ID" doc:id="cbf68ae5-7ef0-4aca-aedf-3a5c97bed7e4" config-ref="Validation_Config" value="#[(vars.pdSite)[0].ID]" message="No PD Site associated" />
+			</validation:all>
+			<db:update doc:name="PD Site" doc:id="4e3e68c5-d027-49a8-8fbc-97eeb47fdd20" config-ref="Database_Config" autoGenerateKeys="true" transactionalAction="ALWAYS_JOIN">
+				<db:sql ><![CDATA[#[ p('secure::db.protocolDeviation.pdSiteUpd')]]]></db:sql>
+				<db:input-parameters ><![CDATA[#[${file::protocolDeviation/updPdSite.dwl}]]]></db:input-parameters>
+			</db:update>
+			<db:update doc:name="Protocol Deviation" doc:id="2351c20e-7eab-49be-a51b-f98c27cd981d" config-ref="Database_Config" transactionalAction="ALWAYS_JOIN">
+				<db:sql ><![CDATA[#[ p('secure::db.protocolDeviation.deviationUpd')]]]></db:sql>
+				<db:input-parameters ><![CDATA[#[${file::protocolDeviation/updProtocolDeviation.dwl}]]]></db:input-parameters>
+			</db:update>
+			<choice doc:name="Choice" doc:id="12be7e65-558b-4ac8-b268-811d3a0f250a" >
+				<when expression="#[vars.inputPayload.noSubjectAssociated == 0 and (vars.pdSite)[0].NO_SUBJECT_ASSOCIATED == false]">
+					<db:update doc:name="PD Site Patient" doc:id="cf5928b6-dce5-42a4-b2f0-82a60097ab41" config-ref="Database_Config" transactionalAction="ALWAYS_JOIN">
+				<db:sql><![CDATA[#[ p('secure::db.protocolDeviation.pdSitePatientUpd')]]]></db:sql>
+				<db:input-parameters><![CDATA[#[${file::protocolDeviation/updPdSitePatient.dwl}]]]></db:input-parameters>
+			</db:update>
+				</when>
+				<when expression="#[vars.inputPayload.noSubjectAssociated == 0 and (vars.pdSite)[0].NO_SUBJECT_ASSOCIATED == true]">
+					<db:insert doc:name="PD Site Patient" doc:id="5d363798-4beb-4abe-b969-951d3a28b3f3" config-ref="Database_Config" transactionalAction="ALWAYS_JOIN">
+						<db:sql ><![CDATA[#[ p('secure::db.protocolDeviation.pdSitePatientIns')]]]></db:sql>
+						<db:input-parameters ><![CDATA[#[${file::protocolDeviation/insPdSitePatient.dwl}]]]></db:input-parameters>
+					</db:insert>
+				</when>
+				<when expression="#[vars.inputPayload.noSubjectAssociated == 1 and (vars.pdSite)[0].NO_SUBJECT_ASSOCIATED == false]">
+					<!-- <db:delete doc:name="PD Site Patient" doc:id="3d2d128a-5ff8-45aa-9316-0bcaee297e61" config-ref="Database_Config" transactionalAction="ALWAYS_JOIN">
+						<db:sql ><![CDATA[#[ p('secure::db.protocolDeviation.pdSitePatientDel')]]]></db:sql>
+						<db:input-parameters ><![CDATA[#[{PD_SITE_ID: vars.inputPayload.pdSiteId}]]]></db:input-parameters>
+					</db:delete> -->
+					<db:update doc:name="PD Site Patient" doc:id="6a567210-4383-4d0a-894b-ca6eb48789d2" config-ref="Database_Config" transactionalAction="ALWAYS_JOIN">
+						<db:sql ><![CDATA[#[ p('secure::db.protocolDeviation.pdSitePatientDel')]]]></db:sql>
+						<db:input-parameters ><![CDATA[#[${file::protocolDeviation/delPdSitePatient.dwl}]]]></db:input-parameters>
+					
+</db:update>
+				</when>
+				<otherwise >
+					<logger level="INFO" doc:name="Logger" doc:id="a21bf07d-83b5-4a4a-ab34-50e166b01f90" message="#['PD_SITE_PATIENT: No change to PD_SITE_PATIENT records']"/>
+				</otherwise>
+			</choice>
+			<ee:transform doc:name="Transform Message" doc:id="68b04ea8-4215-4657-9926-cc229fcb555d" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+		
+</try>
+		<iqvia:log-entries doc:name="Log entries" doc:id="fad5dbe3-d6c0-4be8-bf43-36d278e0ad1f" config-ref="IQVIA_Logging_Connector_Config" transactionId="#[vars.tid]" eventName="End Protocol Deviation - Update" meta='#[{"Callflow":"Outbound","Calltype":"Response","Response-Code":"200","Error-Msg":"None","Response-Size":payload.affectedRows,"KB":"none"}]'/>
+	</sub-flow>
+	<sub-flow name="iqvia-dtms-il2-sys-api-implFlow-insertContact" doc:id="64189545-d005-4c8b-910a-d64d8d0e26f2" >
+	<iqvia:log-entries doc:name="Log entries" doc:id="5e915c3e-bea2-4f6f-a232-5f25477b558e" config-ref="IQVIA_Logging_Connector_Config" transactionId="#[vars.tid]" eventName="Begin Contact - Insert" meta='#[{"Callflow":"Outbound","Calltype":"Request","API-Hostname":server.host,"DB-Server-Name":attributes.headers.dbhost,"DB-Instance":attributes.headers.dbdatabase, "DB-Request":"db.Contact.insert"}]'/>
+	<try doc:name="Try" doc:id="17fd9a94-989e-4582-980d-fdeab497c3bb" transactionalAction="ALWAYS_BEGIN">
+			<flow-ref doc:name="iqvia-dtms-il2-sys-api-implFlow-User" doc:id="0c842cd5-a4b0-4fa5-a6a7-bfa108dec271" name="iqvia-dtms-il2-sys-api-implFlow-User"/>
+			<choice doc:name="Choice" doc:id="f2ee0dc8-14fb-4837-8a1d-8dc52287197c" >
+				<when expression="#[(vars.inputPayload.emailAddress)!= null]">
+			
+			<db:select doc:name="Contact" doc:id="67181217-85b2-41d1-a1ba-793747dbc723" config-ref="Database_Config" transactionalAction="ALWAYS_JOIN" target="contactID">
+				<db:sql ><![CDATA[#[ p('secure::db.contact.contactSel')]]]></db:sql>
+				<db:input-parameters ><![CDATA[#[{FIRST_NAME: vars.inputPayload.firstName, LAST_NAME: vars.inputPayload.lastName, EMAIL_ADDRESS: vars.inputPayload.emailAddress}]]]></db:input-parameters>
+			</db:select>
+			<choice doc:name="Choice" doc:id="1f9b6b8f-848b-4619-99da-54dac2c28db9" >
+				<when expression="#[(vars.contactID)[0].ID == null]">
+					<db:insert doc:name="Contact" doc:id="ab8678e7-8a6e-489c-ac43-1a49fba44a4f" config-ref="Database_Config" transactionalAction="ALWAYS_JOIN" target="contact" targetValue="#[output application/json --- payload]" autoGenerateKeys="true">
+						<db:sql ><![CDATA[#[ p('secure::db.contact.contactIns')]]]></db:sql>
+						<db:input-parameters ><![CDATA[#[${file::contact/contact.dwl}]]]></db:input-parameters>
+					</db:insert>
+					<db:insert doc:name="Email" doc:id="03829905-d897-4967-bb0c-ea52c3a92516" config-ref="Database_Config" transactionalAction="ALWAYS_JOIN" target="emailID" targetValue="#[output application/json --- payload]" autoGenerateKeys="true">
+						<db:sql ><![CDATA[#[ p('secure::db.contact.emailIns')]]]></db:sql>
+						<db:input-parameters ><![CDATA[#[${file::contact/email.dwl}]]]></db:input-parameters>
+					</db:insert>
+				</when>
+				<otherwise >
+					<logger level="INFO" doc:name="Logger" doc:id="0072d3ad-2ac9-4481-a087-0439b0623c87" message="#['Data already available in Contact and Email table']"/>
+				</otherwise>
+			</choice>
+			</when>
+				<otherwise >
+					<db:insert doc:name="Contact" doc:id="dc853dcc-52a0-40e4-b13e-4d8e6336890e" config-ref="Database_Config" transactionalAction="ALWAYS_JOIN" autoGenerateKeys="true" target="contact">
+						<db:sql ><![CDATA[#[ p('secure::db.contact.contactIns')]]]></db:sql>
+						<db:input-parameters ><![CDATA[#[${file::contact/contact.dwl}]]]></db:input-parameters>
+					</db:insert>
+				</otherwise>
+			
+</choice>
+		</try>
+		<ee:transform doc:name="Transform Message" doc:id="5927fc8b-511a-4a8e-972c-713fa79bc7e0" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"generatedKeys": {
+        "GENERATED_KEYS": if ((vars.contactID)[0].ID == null) vars.contact.generatedKeys.GENERATED_KEYS else (vars.contactID)[0].ID
+    },
+    "affectedRows": 1
+}
+
+	
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<iqvia:log-entries doc:name="Log entries" doc:id="383af8fe-9db8-4b4b-9bfb-c1a84e42f663" config-ref="IQVIA_Logging_Connector_Config" transactionId="#[vars.tid]" eventName="End Contact- Insert" meta='#[{"Callflow":"Outbound","Calltype":"Response","Response-Code":"200","Error-Msg":"None","Response-Size":payload.affectedRows,"KB":"none"}]'/>
+	</sub-flow>
+	<sub-flow name="iqvia-dtms-il2-sys-api-implFlow-insertSiteVisitParticipant" doc:id="17e37eeb-5650-4a0e-848c-1f4669e49696" >
+	<iqvia:log-entries doc:name="Log entries" doc:id="2802acf8-e30c-4829-bcde-32c1a399d4a7" config-ref="IQVIA_Logging_Connector_Config" transactionId="#[vars.tid]" eventName="Begin Site Visit Participant - Insert" meta='#[{"Callflow":"Outbound","Calltype":"Request","API-Hostname":server.host,"DB-Server-Name":attributes.headers.dbhost,"DB-Instance":attributes.headers.dbdatabase, "DB-Request":"db.SiteVisitParticipant.insert"}]'/>
+	<try doc:name="Try" doc:id="49ffd71b-7dda-46d4-ab7b-74ca0b717086" transactionalAction="ALWAYS_BEGIN">
+			<flow-ref doc:name="iqvia-dtms-il2-sys-api-implFlow-User" doc:id="2a3bfcc1-d251-4f04-a96a-22d33c8503ac" name="iqvia-dtms-il2-sys-api-implFlow-User"/>
+			<db:select doc:name="SVP" doc:id="e287cebd-029e-4cad-af44-b193709eaa5e" config-ref="Database_Config" transactionalAction="ALWAYS_JOIN" target="svp">
+				<db:sql ><![CDATA[#[ p('secure::db.svp.svpSel')]]]></db:sql>
+				<db:input-parameters ><![CDATA[#[{CONTACT_ID: vars.inputPayload.contactId, PROTOCOL_SITE_ID: vars.inputPayload.protocolSiteId}]]]></db:input-parameters>
+			</db:select>
+			<db:select doc:name="Email" doc:id="f752626c-91ba-40cc-a6a3-16c53c5f6176" config-ref="Database_Config" transactionalAction="ALWAYS_JOIN" target="email">
+						<db:sql ><![CDATA[#[ p('secure::db.svp.emailSel')]]]></db:sql>
+						<db:input-parameters ><![CDATA[#[{CONTACT_ID: vars.inputPayload.contactId, PROTOCOL_SITE_ID: vars.inputPayload.protocolSiteId, EMAIL_ADDRESS: vars.inputPayload.emailAddress}]]]></db:input-parameters>
+					</db:select>
+					<db:select doc:name="protocolSite" doc:id="74715348-385b-470e-83f8-286c2b3e12cd" config-ref="Database_Config" transactionalAction="ALWAYS_JOIN" target="protocolSite">
+						<db:sql ><![CDATA[#[ p('secure::db.svp.siteSel')]]]></db:sql>
+						<db:input-parameters ><![CDATA[#[{ID: vars.inputPayload.protocolSiteId}]]]></db:input-parameters>
+					</db:select>
+			<ee:transform doc:name="Transform Message" doc:id="6f2d3672-abf0-41c8-b02c-599f01ac49cc">
+						<ee:message>
+						</ee:message>
+						<ee:variables >
+							<ee:set-variable variableName="contactRole" ><![CDATA[%dw 2.0
+output application/java
+---
+{
+	(primaryRole: vars.inputPayload.role) if((vars.svp)[0] == null),
+	(secondaryRole: vars.inputPayload.role)	if (((vars.svp)[0] != null) and !(((vars.svp.CONTACT_PROTOCOL_SITE_ROLE default 'il2Role')contains (vars.inputPayload.role default 'cracRole')) or ((vars.svp.CONTACT_PROTOCOL_SITE_SEC_ROLE default 'il2SecRole') contains (vars.inputPayload.role default 'cracRole')))) 
+	
+	}]]></ee:set-variable>
+							<ee:set-variable variableName="roleNoMatch" ><![CDATA[%dw 2.0
+output application/java
+---
+
+(vars.svp) map ((item, index) ->
+	{
+		(svpId: item.ID) if (item.CONTACT_PROTOCOL_SITE_ROLE == vars.inputPayload.role or item.CONTACT_PROTOCOL_SITE_SEC_ROLE == vars.inputPayload.role)
+	}
+) filter ($.svpId != null)
+]]></ee:set-variable>
+						</ee:variables>
+					</ee:transform>
+					<choice doc:name="Choice" doc:id="e755fb28-86ff-4c54-b6df-0f98c637c44b" >
+						<when expression="#[((vars.svp)[0].ID == null) or ((vars.svp)[0].ID != null and vars.contactRole.secondaryRole != null)]">
+							<db:insert doc:name="SVP" doc:id="319c368b-17a9-4a72-afc9-6c3a20590a72" config-ref="Database_Config" transactionalAction="ALWAYS_JOIN" target="contactProtocolSite" targetValue="#[output application/json --- payload]" autoGenerateKeys="true">
+						<db:sql><![CDATA[#[ p('secure::db.svp.svpIns')]]]></db:sql>
+						<db:input-parameters><![CDATA[#[${file::svp/contactProtocolSite.dwl}]]]></db:input-parameters>
+					</db:insert>
+						</when>
+						<otherwise >
+							<logger level="INFO" doc:name="Logger" doc:id="e27b47c9-f29b-4f17-8ed9-1aa14c9248b8" message="'Data already exists in CONTACT_PROTOCOL_SITE table'"/>
+						</otherwise>
+					</choice>
+					<choice doc:name="Choice" doc:id="48e8d304-ffa8-4a1f-b5d2-88831efc93c7" >
+						<when expression="#[(vars.email)[0] == null and vars.inputPayload.emailAddress != null]">
+							<db:insert doc:name="Email" doc:id="72b1d85d-c356-4f5c-a25f-61b313e99007" config-ref="Database_Config" transactionalAction="ALWAYS_JOIN" target="emailID" targetValue="#[output application/json --- payload]" autoGenerateKeys="true">
+						<db:sql><![CDATA[#[ p('secure::db.svp.emailIns')]]]></db:sql>
+						<db:input-parameters><![CDATA[#[${file::svp/email.dwl}]]]></db:input-parameters>
+					</db:insert>
+						</when>
+						<otherwise >
+							<logger level="INFO" doc:name="Logger" doc:id="0b50103d-a148-48bc-970a-fab98d56f75b" message="'Data already exists in EMAIL table'"/>
+						</otherwise>
+					</choice>
+				
+		</try>
+		<ee:transform doc:name="Transform Message" doc:id="ec7df4be-1922-4b5a-93b9-16c8f9e33f5f" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"generatedKeys": {
+        "GENERATED_KEYS": if ((vars.roleNoMatch)[0].svpId == null) vars.contactProtocolSite.generatedKeys.GENERATED_KEYS else ((vars.roleNoMatch)[0].svpId)
+    },
+    "affectedRows": 1
+}
+
+	
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<iqvia:log-entries doc:name="Log entries" doc:id="d4703db2-0995-454b-9d2f-40eccfde2870" config-ref="IQVIA_Logging_Connector_Config" transactionId="#[vars.tid]" eventName="End Site Visit Participant- Insert" meta='#[{"Callflow":"Outbound","Calltype":"Response","Response-Code":"200","Error-Msg":"None","Response-Size":payload.affectedRows,"KB":"none"}]'/>
+	</sub-flow>
+	<sub-flow name="iqvia-dtms-il2-sys-api-implFlow-insertSiteVisitDocument" doc:id="2f85a6d6-e905-45a9-b418-1780d49ce26a" >
+		<iqvia:log-entries doc:name="Log entries" doc:id="d62a3223-a969-4759-8a7e-907b16d99c34" config-ref="IQVIA_Logging_Connector_Config"/>
+		<try doc:name="Try" doc:id="346142d7-a28a-47cc-bdbf-3e870f0af460" transactionalAction="ALWAYS_BEGIN">
+			<flow-ref doc:name="iqvia-dtms-il2-sys-api-implFlow-User" doc:id="3dea2c5c-bf43-41b4-b478-8a19504f83a4" name="iqvia-dtms-il2-sys-api-implFlow-User"/>
+			<db:select doc:name="DocumentId" doc:id="3d2a30ff-43cb-498a-86b4-103a6b10b1c2" config-ref="Database_Config" target="documentId" transactionalAction="ALWAYS_JOIN">
+				<db:sql >#[ p('secure::db.svd.sel')]</db:sql>
+				<db:input-parameters ><![CDATA[#[{ MONITORING_VISIT_ID: vars.inputPayload.monitoringVisitId, DOCUMENT_TYPE: vars.inputPayload.siteVisitType ++ " " ++ vars.inputPayload.objectType }]]]></db:input-parameters>
+			</db:select>
+			<logger level="INFO" doc:name="Logger" doc:id="de1dcac2-00de-4de1-bd9d-2e2dd6d263c8" message="#[vars.documentId]"/>
+			<validation:all doc:name="All" doc:id="df4af101-28f5-4ef6-9257-7c3adf48ff14" >
+				<validation:is-not-null doc:name="Is not null" doc:id="a0c2a80c-9282-4bef-b5c2-75acd6b913d9" config-ref="Validation_Config" value="#[vars.documentId[0].ID]" message="Document ID is null from the combination of Monitoring visit Id and Document Type"/>
+			</validation:all>
+			<db:insert doc:name="Attachment" doc:id="fb0c2906-40a1-4956-95a5-7bc2730eda86" config-ref="Database_Config" target="attachmentId" autoGenerateKeys="true" transactionalAction="ALWAYS_JOIN">
+				<db:sql >#[ p('secure::db.svd.attachmentIns')]</db:sql>
+				<db:input-parameters ><![CDATA[#[${file::svd/insAttachment.dwl}]]]></db:input-parameters>
+			</db:insert>
+			<db:insert doc:name="RelatedSignatures" doc:id="e727ba65-291c-4ad0-9a52-5b48058d06a7" config-ref="Database_Config" transactionalAction="ALWAYS_JOIN" autoGenerateKeys="true">
+				<db:sql >#[ p('secure::db.svd.relatedSignaturesIns')]</db:sql>
+				<db:input-parameters ><![CDATA[#[${file::svd/insRelatedSignatures.dwl}]]]></db:input-parameters>
+			</db:insert>
+			<db:insert doc:name="WS-IntegrationLog" doc:id="45f6d30d-e432-400c-be3c-bc2a78305609" config-ref="Database_Config" transactionalAction="ALWAYS_JOIN" autoGenerateKeys="true">
+				<db:sql >#[ p('secure::db.svd.wsIntegrationLogIns')]</db:sql>
+				<db:input-parameters ><![CDATA[#[${file::svd/insWsIntegrationLog.dwl}]]]></db:input-parameters>
+			</db:insert>
+			<ee:transform doc:name="Transform Message" doc:id="b0cfc86c-7e27-431b-aad9-f1fca219189c" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+vars.attachmentId
+
+	
+]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+		</try>
+		<iqvia:log-entries doc:name="Log entries" doc:id="06cdd3c4-b7d8-4ae4-b64b-8266203563c3" config-ref="IQVIA_Logging_Connector_Config"/>
+	</sub-flow>
+	<sub-flow name="iqvia-dtms-il2-sys-api-implFlow-User" doc:id="ea351b57-2ab3-4936-bc0a-569375cbf870" >
+		<db:select doc:name="User" doc:id="ee59275a-6d74-4d0d-b50f-ad0b98c9e401" config-ref="Database_Config" target="users" transactionalAction="ALWAYS_JOIN">
+			<db:sql><![CDATA[#[ p('secure::db.user.userSel')]]]></db:sql>
+			<db:input-parameters><![CDATA[#[{LAST_USER: vars.inputPayload.lastUser}]]]></db:input-parameters>
+		</db:select>
+	
+</sub-flow>
+	<sub-flow name="iqvia-dtms-il2-sys-api-imp-SVR-Flow" doc:id="911a0b64-d5cb-4641-9e83-d36d4e8aa9be" >
+		<iqvia:log-entries doc:name="Log entries" doc:id="935344be-9fc4-47b9-ae83-f4b053232a39" config-ref="IQVIA_Logging_Connector_Config"/>
+		<try doc:name="Try" doc:id="57d8352d-611e-4b3c-a2b4-e72b0bf110fc" transactionalAction="ALWAYS_BEGIN">
+			<flow-ref doc:name="iqvia-dtms-il2-sys-api-implFlow-User" doc:id="2c783392-0efa-4085-a8b2-85d68c12167b" name="iqvia-dtms-il2-sys-api-implFlow-User"/>
+			<db:select doc:name="ProtocolMvrTemplateId" doc:id="ec089e08-e2e3-4ba7-b009-7e14c2e59f0c" config-ref="Database_Config" transactionalAction="ALWAYS_JOIN" target="templateId">
+				<db:sql >#[ p('secure::db.svr.selProtocolMvrTemplateId')]</db:sql>
+			</db:select>
+			<db:insert doc:name="MonitoringVisitReport" doc:id="03864912-1733-4c9a-9c7e-0961bc9c384d" config-ref="Database_Config" autoGenerateKeys="true" transactionalAction="ALWAYS_JOIN" target="mvrId">
+				<db:sql >#[ p('secure::db.svr.montoringVReportIns')]</db:sql>
+				<db:input-parameters ><![CDATA[#[${file::svr/insMonitoringVisitReport.dwl}]]]></db:input-parameters>
+			</db:insert>
+			<db:insert doc:name="WS-Integration" doc:id="07669920-956c-4cd5-a8d4-f063e540bbfa" config-ref="Database_Config" autoGenerateKeys="true" target="wsId" transactionalAction="ALWAYS_JOIN">
+			<db:sql>#[ p('secure::db.svr.wsIntegrationLogInsert')]</db:sql>
+			<db:input-parameters><![CDATA[#[${file::svr/insWsIntegrationLog.dwl}]]]></db:input-parameters>
+		</db:insert>
+			<db:insert doc:name="Mvr-Report-Signatures" doc:id="13c3d2c6-d649-42a1-b170-9dab950b2700" config-ref="Database_Config" transactionalAction="ALWAYS_JOIN">
+				<db:sql >#[ p('secure::db.svr.mvrReportSignaturesIns')]</db:sql>
+				<db:input-parameters ><![CDATA[#[${file::svr/insMvrReportSignature.dwl}]]]></db:input-parameters>
+			</db:insert>
+			<ee:transform doc:name="Transform Message" doc:id="627bac1f-eba5-4a3c-b2b2-d1b333f7d6d6" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	
+        "generatedKeys":  if ((vars.mvrId)[0] == null) vars.mvrId.generatedKeys.GENERATED_KEYS else (vars.mvrId)[0],
+    
+    "affectedRows": 1
+}
+]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+		</try>
+		<iqvia:log-entries doc:name="Log entries" doc:id="59366026-dde3-4eb0-94b3-4fede4afe1c1" config-ref="IQVIA_Logging_Connector_Config"/>
+	</sub-flow>
+
+</mule>

@@ -1,0 +1,177 @@
+#%RAML 1.0 DataType
+type: object
+description: 'Defines structure of create Site Visit request'
+#examples: !include ../examples/SiteVisit.raml
+properties: 
+  monitoringMethod:
+    type: string
+    required: true
+    minLength: 1
+    maxLength: 30
+    enum:
+      - Phone
+      - Site
+      - COVID19 rDV
+      - COVID19 SMC
+      - COVID19 rSDM
+  monitoringVisitType:
+    type: string
+    required: true
+    minLength: 1
+    maxLength: 30
+    enum:
+      - Site Evaluation Visit
+      - Site Initiation Visit
+      - Interim Monitoring Visit
+      - Close Out Visit
+  actualVisitDate:
+    type: datetime
+    required: false
+  visitEndDate:
+    type: datetime
+    required: false
+  visitStatus:
+    type: string
+    required: true
+    minLength: 0
+    maxLength: 30
+    enum:
+      - Planned
+      - Confirmed
+      - Actual
+      - Waived
+      - Cancelled
+      - ""
+  visitDays:
+    type: integer
+    required: true
+  plannedVisitDate:
+    type: datetime
+    required: false
+  protocolSiteID:
+    type: integer
+    required: true
+  contactID:
+    type: integer
+    required: true
+  isWaived:
+    type: integer
+    required: true
+    enum:
+      - 0
+      - 1
+  mvrDocStatus:
+    type: integer
+    required: true
+    enum:
+      - 0
+  documentType:
+    type: string
+    required: true
+    minLength: 1
+    maxLength: 100
+    enum:
+      - SEV Confirmation Letter,SEV Follow-up Letter
+      - SIV Confirmation Letter,SIV Follow-up Letter
+      - IMV Confirmation Letter,IMV Follow-up Letter
+      - COV Confirmation Letter,COV Follow-up Letter
+  confirmedDate:
+    type: datetime
+    required: false
+  followUpLetterDate:
+    type: datetime
+    required: false
+  documentVersion:
+    type: integer
+    required: true
+  dateCreated:
+    type: datetime
+    required: true
+  dateStart:
+    type: datetime
+    required: true
+  primaryVisitContact:
+    type: integer
+    required: true
+    enum:
+      - 1
+  docNeedsReview:
+    type: integer
+    required: true
+    enum:
+      - 0
+  mustBeTracked:
+    type: integer
+    required: true
+    enum:
+      - 0
+  isTemplate:
+    type: integer
+    required: true
+    enum:
+      - 0
+  rfEnrollment:
+    type: integer
+    required: true
+    enum:
+      - 0
+  rfStudy:
+    type: integer
+    required: true
+    enum:
+      - 0
+  rfIpShipment:
+    type: integer
+    required: true
+    enum:
+      - 0
+  rfAudit:
+    type: integer
+    required: true
+    enum:
+      - 0
+  rfIrbEcSubmittal:
+    type: integer
+    required: true
+    enum:
+      - 0
+  rtBeforeSend:
+    type: integer
+    required: true
+    enum:
+      - 0
+  rtAfterReceived:
+    type: integer
+    required: true
+    enum:
+      - 0
+  rtFinal:
+    type: integer
+    required: true
+    enum:
+      - 0
+  entityId:
+    type: integer
+    required: true
+    enum:
+      - 0
+  recordStatus:
+    type: integer
+    required: true
+    enum:
+      - 0
+      - 1
+      - 2
+  documentSkipped:
+    type: integer
+    required: true
+    enum:
+      - 0
+  lastUser:
+    type: integer
+    required: true
+  
+  
+  
+  
+  

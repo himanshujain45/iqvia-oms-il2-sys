@@ -1,0 +1,139 @@
+#%RAML 1.0 DataType
+type: object
+description: 'Defines structure of create Protocol Deviation request'
+#examples: !include ../examples/ProtocolDeviation.raml
+properties: 
+  recordLocked:
+    type: integer
+    required: true
+    enum:
+      - 0
+      - 1
+  protocolSiteId:
+    type: integer
+    required: true
+  patientNumber:
+    type: string
+    maxLength: 50 
+    required: true
+  noSubjectAssociated:
+    type: integer
+    required: true
+    enum:
+      - 0
+      - 1
+  protocolId:
+    type: integer
+    required: true 
+  dateReported:
+    type: datetime
+    required: true
+  dateOccurred:
+    type: datetime
+    required: true
+  pdCategoryName:
+    type: !include PDCategoryName.raml
+    required: true
+  causality:
+    type: string
+    required: true
+    maxLength: 10
+  description:
+    type: string
+    required: true
+    maxLength: 1024
+  subjectWithdrawn:
+    type: integer
+    required: true
+    enum:
+      - 0
+      - 1
+  irbecReportReq:
+    type: integer
+    required: true
+    enum:
+      - 0
+      - 1
+  actualIrbecReportDate:
+    type: datetime
+    required: false
+  expectedIrbecReportDate:
+    type: datetime
+    required: false
+  dateSponsorNotified:
+    type: datetime
+    required: false
+  dateSponsorAcknowledged:
+    type: datetime
+    required: false
+  status:
+    type: string
+    maxLength: 64
+    required: true
+    enum:
+      - Ready for CTM Review
+      - Ready for Sponsor Review
+      - More Info Required
+      - Closed
+      - Cancelled
+  followUpRequired:
+    type: integer
+    required: true
+    enum:
+      - 0
+      - 1
+  pdFollowUpActionName:
+    type: string
+    maxLength: 50
+    required: false
+    enum:
+      - Get more information
+      - Send for review
+      - None
+  followUpCorrective:
+    type: string
+    maxLength: 1024
+    required: false
+  followUpPreventative:
+    type: string
+    maxLength: 1024
+    required: false
+  majorMinor:
+    type: string
+    maxLength: 64
+    required: true
+    enum:
+      - Minor
+      - Major
+  dateCreated:
+    type: datetime
+    required: true
+  dateStart:
+    type: datetime
+    required: true
+  sponsorAcknowledged:
+    type: integer
+    required: true
+    enum:
+      - 0
+      - 1
+  piNotified:
+    type: integer
+    required: true
+    enum:
+      - 0
+      - 1
+  entityId:
+    type: integer
+    required: true
+    enum:
+      - 0
+  recordStatus:
+    type: integer
+    required: true
+    enum:
+      - 0
+  lastUser:
+    type: integer
+    required: true
+  
