@@ -33,7 +33,7 @@
 						<username>jnhimanshujn</username>
 						<password>189335@HimJ</password>
 						<applicationName>Test1</applicationName>
-						<environment>SANDBOX</environment>
+						<environment>Sandbox</environment>
 						<region>us-east-1</region>
 						<workers>1</workers>
 						<workerType>Micro</workerType>
