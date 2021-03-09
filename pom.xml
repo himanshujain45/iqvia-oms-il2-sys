@@ -27,6 +27,18 @@
 				<version>${mule.maven.plugin.version}</version>
 				<extensions>true</extensions>
 				<configuration>
+    <cloudHubDeployment>
+      <uri>https://anypoint.mulesoft.com</uri>
+      <muleVersion>4.3.0</muleVersion>
+      <username>himanshujnquintiles</username>
+      <password>Welcome@123</password>
+      <applicationName>iqvia-il2-sys-test</applicationName>
+      <environment>DIT</environment>
+      <region>us-east-1</region>
+	    <businessGroup>DTMS-Internal</businessGroup>
+      <workers>2</workers>
+      <workerType>Micro</workerType>
+    </cloudHubDeployment>
 				<classifier>mule-application</classifier>
                 <sharedLibraries>
                         <sharedLibrary>
