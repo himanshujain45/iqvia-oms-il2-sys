@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
+  <pluginGroups>
+  </pluginGroups>
+  <proxies>
+  </proxies>
+
+  <servers>
+	<server>
+      <id>iqvia-group</id>
+      <username>deploying.developer</username>
+      <password>MySocratesNote</password>
+    </server>
+	<server>
+      <id>iqvia-internal</id>
+      <username>deploying.developer</username>
+      <password>MySocratesNote</password>
+    </server>
+     <server>
+      <id>anypoint-exchange</id>
+      <username>rwts_deploy_user</username>
+      <password>Iqvi@123</password>
+    </server>
+
+  </servers>
+  <mirrors>
+  </mirrors>
+
+  <profiles>
+
+    <profile>
+      <id>Mule</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <repositories>
+	    <repository>
+          <id>iqvia-group</id>
+          <name>iqvia-group</name>
+          <url>https://nexusrepo.qimsone.ims.io/repository/iqvia-group/</url>
+          <layout>default</layout>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
+        </repository>
+		<repository>
+            <id>anypoint-exchange</id>
+            <name>Anypoint Exchange</name>
+            <url>https://maven.anypoint.mulesoft.com/api/v1/maven</url>
+            <layout>default</layout>
+        </repository>
+		
+		<repository>
+            <id>anypoint-exchange-v2</id>
+            <name>Anypoint Exchange</name>
+            <url>https://maven.anypoint.mulesoft.com/api/v2/maven</url>
+            <layout>default</layout>
+        </repository>
+    	<repository>
+            <id>mulesoft-releases</id>
+            <name>MuleSoft Releases Repository</name>
+            <url>https://repository.mulesoft.org/releases/</url>
+            <layout>default</layout>
+        </repository>
+        <repository>
+            <id>mulesoft-snapshots</id>
+            <name>MuleSoft Snapshot Repository</name>
+            <url>http://repository.mulesoft.org/snapshots/</url>
+            <layout>default</layout>
+        </repository>
+        
+      </repositories>
+	  <pluginRepositories>
+			<pluginRepository>
+				<id>iqvia-group</id>
+				<url>https://nexusrepo.qimsone.ims.io/repository/iqvia-group/</url>
+			</pluginRepository>
+			<pluginRepository>
+            <id>mulesoft-releases</id>
+            <name>mulesoft release repository</name>
+            <layout>default</layout>
+            <url>https://repository.mulesoft.org/releases/</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </pluginRepository>
+		</pluginRepositories>
+    </profile>
+  </profiles>
+
+</settings>
